@@ -792,7 +792,7 @@
 
             const loadManagers = async () => {
                 try {
-                    const res = await axios.get('/api/users?role=manager');
+                    const res = await axios.get('/api/users');
                     setManagers(res.data);
                 } catch (err) {
                     console.error('Error loading managers:', err);
@@ -987,7 +987,7 @@
                                         >
                                             <option value="">Brak przełożonego</option>
                                             {managers.map(m => (
-                                                <option key={m.id} value={m.id}>{m.first_name} {m.last_name}</option>
+                                                <option key={m.id} value={m.id}>{m.first_name} {m.last_name} ({m.role})</option>
                                             ))}
                                         </select>
                                     </div>
@@ -1077,8 +1077,8 @@
                                             className="w-full px-4 py-2 border rounded-lg"
                                         >
                                             <option value="">Brak przełożonego</option>
-                                            {managers.map(m => (
-                                                <option key={m.id} value={m.id}>{m.first_name} {m.last_name}</option>
+                                            {managers.filter(m => m.id !== editModal.id).map(m => (
+                                                <option key={m.id} value={m.id}>{m.first_name} {m.last_name} ({m.role})</option>
                                             ))}
                                         </select>
                                     </div>
