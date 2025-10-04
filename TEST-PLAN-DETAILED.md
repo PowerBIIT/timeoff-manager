@@ -26,12 +26,20 @@ Dokument definiuje szczegółowy plan testów dla aplikacji **TimeOff Manager**,
 ### Zakres Aplikacji
 
 **Funkcjonalności do przetestowania:**
-- Autentykacja i autoryzacja użytkowników
+- Autentykacja i autoryzacja użytkowników (JWT)
 - Zarządzanie użytkownikami (CRUD)
+- **Deaktywacja użytkowników (is_active flag)** ⭐ NEW
 - Hierarchia przełożonych (supervisor_id)
+- **Interaktywny dashboard z KPI cards** ⭐ NEW
+- **Filtrowanie wniosków przez dashboard KPI** ⭐ NEW
 - Tworzenie i zarządzanie wnioskami urlopowymi
 - Akceptacja/odrzucenie wniosków przez przełożonych
+- **Powiadomienia email (SMTP configuration)** ⭐ NEW
+- **Konfiguracja SMTP przez panel admina** ⭐ NEW
 - Role-based access control (Admin, Manager, Pracownik)
+- **Premium duotone SVG icons (2025 design trends)** ⭐ NEW
+- **Mobile-first responsive design (bottom nav, FAB)** ⭐ NEW
+- **Glassmorphism UI** ⭐ NEW
 
 ---
 
@@ -48,9 +56,10 @@ Dokument definiuje szczegółowy plan testów dla aplikacji **TimeOff Manager**,
 
 ### Out of Scope ❌
 
-- Testy mobilne (aplikacja desktop-only)
-- Testy kompatybilności z przeglądarkami (tylko Chrome)
+- Testy natywnych aplikacji mobilnych (iOS/Android) - aplikacja jest PWA
+- Testy kompatybilności z przeglądarkami starszymi niż Chrome 120, Firefox 120, Safari 16
 - Performance testing powyżej 100 concurrent users
+- Testy offline mode (future enhancement)
 
 ---
 
@@ -621,7 +630,284 @@ def test_employee_create_request_flow(page):
 
 ---
 
-### 5.4 Hierarchia Przełożonych
+### 5.4 Interaktywny Dashboard z KPI (⭐ NEW)
+
+#### TC-DASH-001: Wyświetlanie KPI cards na dashboardzie
+
+**Priorytet:** Krytyczny
+
+**Warunki wstępne:**
+- Zalogowany jako dowolny użytkownik
+- W systemie istnieją wnioski z różnymi statusami
+
+**Kroki:**
+1. Zaloguj się do aplikacji
+2. Przejdź do Dashboard (domyślny widok po zalogowaniu)
+
+**Oczekiwany rezultat:**
+- ✅ Widoczne 4 KPI cards:
+  - "Wszystkie" (niebieska) z custom ikoną ChartBar
+  - "Oczekujące" (bursztynowa) z custom ikoną Hourglass
+  - "Zaakceptowane" (zielona) z custom ikoną CheckCircle
+  - "Odrzucone" (czerwona) z custom ikoną XCircle
+- ✅ Każda karta pokazuje poprawną liczbę wniosków
+- ✅ Ikony są premium duotone SVG (NIE emoji)
+- ✅ Karty są responsive (2 kolumny na mobile, 4 na desktop)
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-DASH-002: Filtrowanie wniosków przez KPI card
+
+**Priorytet:** Krytyczny
+
+**Warunki wstępne:**
+- Zalogowany jako admin/manager
+- W systemie są wnioski: 2 pending, 3 approved, 1 rejected
+
+**Kroki:**
+1. Kliknij kartę "Oczekujące" (2)
+2. Sprawdź tabelę poniżej
+3. Kliknij kartę "Zaakceptowane" (3)
+4. Sprawdź tabelę ponownie
+5. Kliknij kartę "Wszystkie"
+
+**Oczekiwany rezultat:**
+- ✅ Po kliknięciu "Oczekujące": tabela pokazuje tylko 2 wnioski pending
+- ✅ Po kliknięciu "Zaakceptowane": tabela pokazuje tylko 3 wnioski approved
+- ✅ Po kliknięciu "Wszystkie": tabela pokazuje wszystkie 6 wniosków
+- ✅ Aktywna karta ma highlight (ring-4)
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-DASH-003: KPI cards dla różnych ról
+
+**Priorytet:** Wysoki
+
+**Kroki:**
+1. Zaloguj jako pracownik (emp1)
+   - Pracownik ma: 1 pending, 2 approved własne wnioski
+2. Sprawdź liczby na KPI cards
+3. Wyloguj i zaloguj jako manager (manager1)
+   - Manager widzi swoje + podwładnych: 5 total
+4. Sprawdź liczby na KPI cards
+
+**Oczekiwany rezultat:**
+- ✅ Pracownik widzi tylko swoje wnioski w KPI (1+2=3 total)
+- ✅ Manager widzi swoje + podwładnych w KPI (5 total)
+- ✅ Admin widzi wszystkie wnioski w KPI
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-DASH-004: Witaj z ikoną Wave (zamiast emoji)
+
+**Priorytet:** Średni
+
+**Warunki wstępne:**
+- Zalogowany jako Jan Kowalski
+
+**Kroki:**
+1. Sprawdź nagłówek dashboardu
+
+**Oczekiwany rezultat:**
+- ✅ Tekst: "Witaj, Jan!" (imię użytkownika)
+- ✅ Ikona Wave (SVG) obok tekstu - NIE emoji 👋
+- ✅ Ikona ma kolor emerald-500
+- ✅ Ikona jest duotone (wielowarstwowa)
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+### 5.5 Deaktywacja Użytkowników (⭐ NEW)
+
+#### TC-DEACT-001: Deaktywacja użytkownika przez admina
+
+**Priorytet:** Krytyczny
+
+**Warunki wstępne:**
+- Zalogowany jako admin
+- Użytkownik emp1 jest aktywny (is_active=true)
+
+**Kroki:**
+1. Przejdź do Użytkownicy
+2. Kliknij "Edytuj" przy emp1
+3. Odznacz checkbox "Aktywny"
+4. Zapisz
+
+**Oczekiwany rezultat:**
+- ✅ Komunikat: "Użytkownik został zaktualizowany"
+- ✅ W tabeli przy emp1 widoczny badge "Nieaktywny" (szary)
+- ✅ emp1 NIE może się zalogować
+- ✅ Dane emp1 pozostały w bazie (nie usunięte)
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-DEACT-002: Nieaktywny użytkownik nie może być wybrany jako przełożony
+
+**Priorytet:** Wysoki
+
+**Warunki wstępne:**
+- emp1 jest nieaktywny (is_active=false)
+- emp2 jest aktywny
+
+**Kroki:**
+1. Zaloguj jako admin
+2. Spróbuj utworzyć nowego użytkownika
+3. Sprawdź dropdown "Przełożony"
+
+**Oczekiwany rezultat:**
+- ✅ Dropdown NIE zawiera emp1 (nieaktywnego)
+- ✅ Dropdown zawiera emp2 (aktywnego)
+- ✅ Lub emp1 jest wyświetlony z oznaczeniem "(nieaktywny)" i disabled
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-DEACT-003: Logowanie nieaktywnego użytkownika
+
+**Priorytet:** Krytyczny
+
+**Warunki wstępne:**
+- emp1 został dezaktywowany (is_active=false)
+
+**Kroki:**
+1. Wyloguj się
+2. Spróbuj zalogować jako emp1 / emp123
+
+**Oczekiwany rezultat:**
+- ✅ Logowanie NIE powiodło się
+- ✅ Błąd: "Konto zostało dezaktywowane" lub "Nieprawidłowe dane logowania"
+- ✅ Brak dostępu do aplikacji
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-DEACT-004: Ponowna aktywacja użytkownika
+
+**Priorytet:** Średni
+
+**Warunki wstępne:**
+- emp1 jest nieaktywny
+
+**Kroki:**
+1. Zaloguj jako admin
+2. Edytuj emp1
+3. Zaznacz checkbox "Aktywny"
+4. Zapisz
+5. Wyloguj i zaloguj jako emp1
+
+**Oczekiwany rezultat:**
+- ✅ emp1 może się zalogować ponownie
+- ✅ Wszystkie dane emp1 zachowane (wnioski, historia)
+- ✅ Badge "Nieaktywny" zniknął
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+### 5.6 Konfiguracja SMTP i Powiadomienia Email (⭐ NEW)
+
+#### TC-SMTP-001: Konfiguracja SMTP przez admina
+
+**Priorytet:** Krytyczny
+
+**Warunki wstępne:**
+- Zalogowany jako admin
+- Masz dostęp do SMTP server (np. Gmail App Password)
+
+**Kroki:**
+1. Przejdź do Ustawienia
+2. Wypełnij formularz SMTP:
+   - Server: smtp.gmail.com
+   - Port: 587
+   - Use SSL: ✓
+   - Login: test@gmail.com
+   - Password: [App Password]
+   - Email From: system@firma.pl
+3. Kliknij "Zapisz konfigurację"
+
+**Oczekiwany rezultat:**
+- ✅ Komunikat: "Konfiguracja została zapisana"
+- ✅ Dane SMTP zapisane w bazie (tabela smtp_config)
+- ✅ Hasło SMTP jest zahashowane (NIE plaintext)
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-SMTP-002: Test połączenia SMTP
+
+**Priorytet:** Wysoki
+
+**Warunki wstępne:**
+- SMTP skonfigurowany poprawnie
+
+**Kroki:**
+1. W Ustawieniach kliknij "Test połączenia"
+
+**Oczekiwany rezultat:**
+- ✅ Komunikat: "Test email wysłany pomyślnie"
+- ✅ Email dotarł na skonfigurowany adres
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-SMTP-003: Powiadomienie email przy nowym wniosku
+
+**Priorytet:** Krytyczny
+
+**Warunki wstępne:**
+- SMTP skonfigurowany
+- emp1 ma przełożonego manager1
+
+**Kroki:**
+1. Zaloguj jako emp1
+2. Utwórz wniosek urlopowy
+3. Złóż wniosek
+4. Sprawdź email manager1
+
+**Oczekiwany rezultat:**
+- ✅ Manager1 otrzymał email z tematem zawierającym "Nowy wniosek"
+- ✅ Email zawiera: imię pracownika, typ urlopu, daty
+- ✅ Email zawiera link do aplikacji (opcjonalnie)
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-SMTP-004: Powiadomienie email po akceptacji/odrzuceniu
+
+**Priorytet:** Krytyczny
+
+**Warunki wstępne:**
+- SMTP skonfigurowany
+- emp1 złożył wniosek
+
+**Kroki:**
+1. Zaloguj jako manager1
+2. Zaakceptuj wniosek emp1
+3. Sprawdź email emp1
+
+**Oczekiwany rezultat:**
+- ✅ emp1 otrzymał email z tematem "Wniosek zaakceptowany"
+- ✅ Email zawiera informacje o wniosku i decyzji
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+### 5.7 Hierarchia Przełożonych
 
 #### TC-HIER-001: Manager może mieć Managera jako przełożonego
 
@@ -954,6 +1240,175 @@ def test_delete_others_request(client):
 ---
 
 ## 7. Testy UI/Frontend
+
+### 7.0 Testy Responsive Design i Mobile-First (⭐ NEW)
+
+#### TC-RESP-001: Mobile Bottom Navigation
+
+**Priorytet:** Krytyczny
+
+**Warunki wstępne:**
+- Resize przeglądarki do 375x667 (iPhone SE)
+- Zalogowany jako dowolny użytkownik
+
+**Kroki:**
+1. Sprawdź dolną część ekranu
+
+**Oczekiwany rezultat:**
+- ✅ Widoczna dolna nawigacja z ikonami:
+  - Dashboard
+  - Calendar (Wnioski)
+  - Clock (Historia)
+  - Users (tylko admin/manager)
+  - Settings (tylko admin)
+- ✅ Ikony są duotone SVG (NIE emoji)
+- ✅ Aktywna zakładka ma kolor niebieski
+- ✅ Bottom nav jest sticky (zawsze widoczny)
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-RESP-002: FAB Button (Floating Action Button) na mobile
+
+**Priorytet:** Wysoki
+
+**Warunki wstępne:**
+- Mobile view (< 768px)
+- Zalogowany jako pracownik
+
+**Kroki:**
+1. Sprawdź prawy dolny róg ekranu
+
+**Oczekiwany rezultat:**
+- ✅ Widoczny FAB button "+" (nowy wniosek)
+- ✅ Button ma gradient emerald
+- ✅ Po kliknięciu otwiera formularz nowego wniosku
+- ✅ Button jest ponad bottom navigation
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-RESP-003: Hamburger Menu na mobile
+
+**Priorytet:** Średni
+
+**Warunki wstępne:**
+- Mobile view
+- Zalogowany jako admin
+
+**Kroki:**
+1. Kliknij ikonę Menu (3 linie) w górnym prawym rogu
+2. Sprawdź wyświetlone menu
+
+**Oczekiwany rezultat:**
+- ✅ Menu rozwija się z animacją
+- ✅ Zawiera: Profil, Ustawienia, Wyloguj
+- ✅ Ikony są duotone SVG
+- ✅ Menu zamyka się po kliknięciu poza nim
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-RESP-004: Desktop Navigation (sidebar/top nav)
+
+**Priorytet:** Wysoki
+
+**Warunki wstępne:**
+- Desktop view (>= 1024px)
+- Zalogowany jako manager
+
+**Kroki:**
+1. Sprawdź nawigację
+
+**Oczekiwany rezultat:**
+- ✅ Bottom navigation NIE jest widoczna na desktop
+- ✅ Top navigation lub sidebar z wszystkimi opcjami
+- ✅ Ikony są duotone SVG z tekstem
+- ✅ FAB button NIE jest widoczny (zastąpiony normalnym przyciskiem)
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-RESP-005: KPI Cards Responsive Layout
+
+**Priorytet:** Wysoki
+
+**Kroki:**
+1. Otwórz dashboard na mobile (375px)
+2. Sprawdź układ KPI cards
+3. Resize do tablet (768px)
+4. Resize do desktop (1920px)
+
+**Oczekiwany rezultat:**
+- ✅ Mobile (< 640px): 2 kolumny (2x2 grid)
+- ✅ Tablet/Desktop (>= 1024px): 4 kolumny (1x4 grid)
+- ✅ Karty zachowują proporcje i czytelność
+- ✅ Ikony skalują się poprawnie
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-RESP-006: Tabela wniosków na mobile
+
+**Priorytet:** Wysoki
+
+**Warunki wstępne:**
+- Mobile view
+- Lista wniosków z minimum 5 pozycjami
+
+**Kroki:**
+1. Sprawdź tabelę wniosków
+
+**Oczekiwany rezultat:**
+- ✅ Tabela jest scrollable horizontalnie LUB
+- ✅ Tabela przekształcona w cards (responsive cards)
+- ✅ Wszystkie kolumny są czytelne
+- ✅ Przyciski akcji są dostępne (touch-friendly)
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-UI-007: Premium Duotone Icons Quality
+
+**Priorytet:** Średni
+
+**Kroki:**
+1. Sprawdź wszystkie ikony w aplikacji
+2. Użyj DevTools → Inspect SVG
+
+**Oczekiwany rezultat:**
+- ✅ Wszystkie ikony to SVG (nie PNG/JPG)
+- ✅ Ikony używają opacity layers (0.3, 0.5, 0.6) dla efektu duotone
+- ✅ Brak emoji w całej aplikacji
+- ✅ Ikony używają currentColor dla themowania
+- ✅ Geometryczne kształty (prostokąty, okręgi, ścieżki)
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
+
+#### TC-UI-008: Glassmorphism Effects
+
+**Priorytet:** Niski
+
+**Kroki:**
+1. Sprawdź KPI cards, modals, karty
+
+**Oczekiwany rezultat:**
+- ✅ Elementy mają semi-transparent tło
+- ✅ Widoczny backdrop-blur
+- ✅ Subtelne shadows i borders
+- ✅ Efekt "szkła" jest czytelny ale nie przesadny
+
+**Status:** [ ] Pass / [ ] Fail
+
+---
 
 ### 7.1 Test Suite: Playwright E2E
 
