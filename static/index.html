@@ -297,7 +297,9 @@
         // ============================================
         const DashboardView = ({ user }) => {
             const [stats, setStats] = useState(null);
+            const [requests, setRequests] = useState([]);
             const [loading, setLoading] = useState(true);
+            const [selectedFilter, setSelectedFilter] = useState(null);
 
             useEffect(() => {
                 loadStats();
@@ -313,13 +315,14 @@
                     }
 
                     const res = await axios.get(endpoint);
-                    const requests = res.data;
+                    const allRequests = res.data;
+                    setRequests(allRequests);
 
                     setStats({
-                        total: requests.length,
-                        pending: requests.filter(r => r.status === 'oczekujący').length,
-                        approved: requests.filter(r => r.status === 'zaakceptowany').length,
-                        rejected: requests.filter(r => r.status === 'odrzucony').length,
+                        total: allRequests.length,
+                        pending: allRequests.filter(r => r.status === 'oczekujący').length,
+                        approved: allRequests.filter(r => r.status === 'zaakceptowany').length,
+                        rejected: allRequests.filter(r => r.status === 'odrzucony').length,
                     });
                 } catch (err) {
                     console.error('Error loading stats:', err);
@@ -328,10 +331,26 @@
                 }
             };
 
+            const handleCardClick = (filter) => {
+                setSelectedFilter(selectedFilter === filter ? null : filter);
+            };
+
+            const getFilteredRequests = () => {
+                if (!selectedFilter) return [];
+                if (selectedFilter === 'all') return requests;
+                if (selectedFilter === 'pending') return requests.filter(r => r.status === 'oczekujący');
+                if (selectedFilter === 'approved') return requests.filter(r => r.status === 'zaakceptowany');
+                if (selectedFilter === 'rejected') return requests.filter(r => r.status === 'odrzucony');
+                return [];
+            };
+
             if (loading) return <LoadingSpinner />;
 
-            const StatCard = ({ title, value, color, icon }) => (
-                <div className={`bg-white rounded-2xl shadow-lg p-6 border-l-4 border-${color}-500`}>
+            const StatCard = ({ title, value, color, icon, filter }) => (
+                <div
+                    onClick={() => handleCardClick(filter)}
+                    className={`bg-white rounded-2xl shadow-lg p-6 border-l-4 border-${color}-500 cursor-pointer transition-all hover:shadow-xl hover:scale-105 ${selectedFilter === filter ? 'ring-4 ring-' + color + '-300' : ''}`}
+                >
                     <div className="flex justify-between items-start">
                         <div>
                             <p className="text-gray-500 text-sm font-semibold mb-1">{title}</p>
@@ -339,20 +358,92 @@
                         </div>
                         <span className="text-4xl opacity-20">{icon}</span>
                     </div>
+                    {selectedFilter === filter && (
+                        <div className="mt-3 text-xs text-gray-500 font-medium">
+                            ▼ Kliknij ponownie aby ukryć
+                        </div>
+                    )}
                 </div>
             );
+
+            const statusColors = {
+                'oczekujący': 'bg-yellow-100 text-yellow-800',
+                'zaakceptowany': 'bg-green-100 text-green-800',
+                'odrzucony': 'bg-red-100 text-red-800',
+            };
+
+            const filteredRequests = getFilteredRequests();
 
             return (
                 <div className="p-8">
                     <h2 className="text-3xl font-bold mb-2">Witaj, {user.first_name}!</h2>
                     <p className="text-gray-500 mb-8">Oto podsumowanie Twoich wniosków</p>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <StatCard title="Wszystkie wnioski" value={stats?.total || 0} color="blue" icon="📊" />
-                        <StatCard title="Oczekujące" value={stats?.pending || 0} color="yellow" icon="⏳" />
-                        <StatCard title="Zaakceptowane" value={stats?.approved || 0} color="green" icon="✅" />
-                        <StatCard title="Odrzucone" value={stats?.rejected || 0} color="red" icon="❌" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <StatCard title="Wszystkie wnioski" value={stats?.total || 0} color="blue" icon="📊" filter="all" />
+                        <StatCard title="Oczekujące" value={stats?.pending || 0} color="yellow" icon="⏳" filter="pending" />
+                        <StatCard title="Zaakceptowane" value={stats?.approved || 0} color="green" icon="✅" filter="approved" />
+                        <StatCard title="Odrzucone" value={stats?.rejected || 0} color="red" icon="❌" filter="rejected" />
                     </div>
+
+                    {selectedFilter && (
+                        <div className="mt-8">
+                            <h3 className="text-2xl font-bold mb-4">
+                                {selectedFilter === 'all' && 'Wszystkie wnioski'}
+                                {selectedFilter === 'pending' && 'Wnioski oczekujące'}
+                                {selectedFilter === 'approved' && 'Wnioski zaakceptowane'}
+                                {selectedFilter === 'rejected' && 'Wnioski odrzucone'}
+                                {' '}({filteredRequests.length})
+                            </h3>
+
+                            {filteredRequests.length === 0 ? (
+                                <div className="text-center py-12 bg-white rounded-2xl shadow">
+                                    <p className="text-gray-400 text-lg">Brak wniosków w tej kategorii</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {filteredRequests.map(req => (
+                                        <div key={req.id} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-3 mb-3">
+                                                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColors[req.status]}`}>
+                                                            {req.status.toUpperCase()}
+                                                        </span>
+                                                        <span className="text-gray-500">#{req.id}</span>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                        <div>
+                                                            <p className="text-sm text-gray-500">Pracownik</p>
+                                                            <p className="font-semibold">{req.user_name}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm text-gray-500">Data</p>
+                                                            <p className="font-semibold">{req.date}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm text-gray-500">Godziny</p>
+                                                            <p className="font-semibold">{req.start_time} - {req.end_time}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm text-gray-500">Przełożony</p>
+                                                            <p className="font-semibold">{req.supervisor_name || '-'}</p>
+                                                        </div>
+                                                    </div>
+                                                    {req.reason && (
+                                                        <div className="mt-3">
+                                                            <p className="text-sm text-gray-500">Powód</p>
+                                                            <p className="text-gray-700">{req.reason}</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             );
         };
