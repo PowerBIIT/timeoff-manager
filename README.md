@@ -2,7 +2,30 @@
 
 System zarządzania wnioskami o wyjścia służbowe z pełnym systemem ról (Pracownik, Manager, Administrator).
 
-**🚀 LIVE:** https://timeoff-manager-20251004.azurewebsites.net
+**🚀 PRODUCTION URL:** https://timeoff-manager-20251004.azurewebsites.net
+
+⚠️ **UWAGA:** Serwisy Azure są ZATRZYMANE (aby nie generować kosztów na prywatnej subskrypcji).
+
+**Aby uruchomić aplikację:**
+```bash
+# 1. Uruchom App Service
+az webapp start --resource-group timeoff-rg-prod --name timeoff-manager-20251004
+
+# 2. Uruchom PostgreSQL Database
+az postgres flexible-server start --resource-group timeoff-rg-prod --name timeoff-db-20251004
+
+# 3. Poczekaj ~2 minuty na pełne uruchomienie
+# 4. Aplikacja dostępna pod: https://timeoff-manager-20251004.azurewebsites.net
+```
+
+**Aby ZATRZYMAĆ serwisy (oszczędzanie kosztów):**
+```bash
+# 1. Zatrzymaj App Service
+az webapp stop --resource-group timeoff-rg-prod --name timeoff-manager-20251004
+
+# 2. Zatrzymaj PostgreSQL Database
+az postgres flexible-server stop --resource-group timeoff-rg-prod --name timeoff-db-20251004
+```
 
 > 📚 **Szukasz czegoś konkretnego?** → [INDEX.md](INDEX.md) - Pełna dokumentacja i nawigacja
 
