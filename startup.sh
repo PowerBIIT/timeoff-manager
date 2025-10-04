@@ -3,6 +3,10 @@
 
 echo "🚀 Starting TimeOff Manager..."
 
+# Run database migration first
+echo "📦 Running database migrations..."
+python run_migration.py || echo "⚠️  Migration script not available or failed"
+
 # Initialize database if needed
 echo "📦 Initializing database..."
 python init_db.py

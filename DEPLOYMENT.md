@@ -1,6 +1,20 @@
 # 🚀 TimeOff Manager - Przewodnik Wdrożenia Produkcyjnego
 
+## ✅ LIVE PRODUCTION
+**URL:** https://timeoff-manager-20251004.azurewebsites.net
+**Status:** Deployed and tested ✅
+**Last Updated:** 2025-10-04
+
+## 📊 Production Test Results
+- ✅ Admin login and user management
+- ✅ Supervisor hierarchy (any user can be supervisor)
+- ✅ Supervisor dropdown shows ALL users with roles
+- ✅ Self-selection prevention
+- ✅ Role-based access control
+- ✅ Request validation
+
 ## 📋 Spis treści
+- [Live Deployment Info](#live-deployment-info)
 - [Wymagania](#wymagania)
 - [Przygotowanie](#przygotowanie)
 - [Deployment na Azure](#deployment-na-azure)
@@ -8,6 +22,40 @@
 - [Monitorowanie](#monitorowanie)
 - [Backup i Recovery](#backup-i-recovery)
 - [Troubleshooting](#troubleshooting)
+
+---
+
+## 🌐 Live Deployment Info
+
+### Azure Resources
+- **Resource Group:** timeoff-rg-prod
+- **App Service:** timeoff-manager-20251004
+- **Database Server:** timeoff-db-20251004.postgres.database.azure.com
+- **Database Name:** timeoffdb
+- **Location:** West Europe
+- **Plan:** Basic (B1)
+
+### Credentials
+Database password stored in: `~/.azure-credentials`
+
+### Test Accounts
+| Role          | Email              | Password    | Supervisor     |
+|---------------|-------------------|-------------|----------------|
+| Administrator | admin@firma.pl    | admin123    | -              |
+| Manager       | manager@firma.pl  | manager123  | -              |
+| Employee      | jan@firma.pl      | jan123      | Anna Kowalska  |
+
+### Quick Commands
+```bash
+# View logs
+az webapp log tail --resource-group timeoff-rg-prod --name timeoff-manager-20251004
+
+# Restart app
+az webapp restart --resource-group timeoff-rg-prod --name timeoff-manager-20251004
+
+# Check status
+az webapp show --resource-group timeoff-rg-prod --name timeoff-manager-20251004 --query state
+```
 
 ---
 
