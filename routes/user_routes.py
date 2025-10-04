@@ -187,6 +187,81 @@ def update_user(user_id):
         return jsonify({'error': str(e)}), 500
 
 
+@user_bp.route('/users/<int:user_id>/subordinates', methods=['GET'])
+@require_role('admin')
+def get_user_subordinates(user_id):
+    """
+    Get list of users supervised by this user
+    GET /api/users/:id/subordinates
+    Headers: { "Authorization": "Bearer <token>" }
+    Returns: [{ "id": 1, "first_name": "Jan", "last_name": "Nowak", ... }]
+    """
+    try:
+        user = User.query.get(user_id)
+
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Find all users who have this user as supervisor
+        subordinates = User.query.filter_by(supervisor_id=user_id).all()
+
+        return jsonify({
+            'count': len(subordinates),
+            'subordinates': [s.to_dict() for s in subordinates]
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@user_bp.route('/users/<int:user_id>/reassign-subordinates', methods=['POST'])
+@require_role('admin')
+def reassign_subordinates(user_id):
+    """
+    Reassign all subordinates to a new supervisor
+    POST /api/users/:id/reassign-subordinates
+    Body: { "new_supervisor_id": 5 }
+    Headers: { "Authorization": "Bearer <token>" }
+    Returns: { "success": true, "reassigned_count": 3 }
+    """
+    try:
+        data = request.get_json()
+        new_supervisor_id = data.get('new_supervisor_id')
+
+        # Validate new supervisor exists and is active
+        if new_supervisor_id:
+            new_supervisor = User.query.get(new_supervisor_id)
+            if not new_supervisor:
+                return jsonify({'error': 'New supervisor not found'}), 404
+            if not new_supervisor.is_active:
+                return jsonify({'error': 'New supervisor is not active'}), 400
+
+        # Find all subordinates
+        subordinates = User.query.filter_by(supervisor_id=user_id).all()
+
+        # Reassign them
+        for subordinate in subordinates:
+            subordinate.supervisor_id = new_supervisor_id
+
+        db.session.commit()
+
+        # Log action
+        log_action(
+            g.user_id,
+            'SUBORDINATES_REASSIGNED',
+            f'Reassigned {len(subordinates)} subordinates from user {user_id} to {new_supervisor_id}'
+        )
+
+        return jsonify({
+            'success': True,
+            'reassigned_count': len(subordinates)
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
 @user_bp.route('/users/<int:user_id>', methods=['DELETE'])
 @require_role('admin')
 def delete_user(user_id):
