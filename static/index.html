@@ -956,6 +956,7 @@
                         });
                         showToast('Użytkownik aktywowany', 'success');
                         loadUsers();
+                        loadManagers();
                     } catch (err) {
                         showToast(err.response?.data?.error || 'Błąd aktywacji', 'error');
                     }
@@ -982,6 +983,7 @@
                         });
                         showToast('Użytkownik deaktywowany', 'success');
                         loadUsers();
+                        loadManagers();
                     }
                 } catch (err) {
                     showToast(err.response?.data?.error || 'Błąd deaktywacji', 'error');
@@ -1009,6 +1011,7 @@
                     setReassignModal(null);
                     setNewSupervisorId(null);
                     loadUsers();
+                    loadManagers();
                 } catch (err) {
                     showToast(err.response?.data?.error || 'Błąd przepisywania', 'error');
                 }
