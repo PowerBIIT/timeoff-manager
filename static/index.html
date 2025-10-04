@@ -856,6 +856,8 @@
             const [loading, setLoading] = useState(true);
             const [editModal, setEditModal] = useState(null);
             const [addModal, setAddModal] = useState(false);
+            const [reassignModal, setReassignModal] = useState(null); // { user, subordinates }
+            const [newSupervisorId, setNewSupervisorId] = useState(null);
             const [newUser, setNewUser] = useState({
                 email: '',
                 password: '',
@@ -943,6 +945,78 @@
                 }
             };
 
+            const handleToggleActive = async (user) => {
+                // If activating, just do it
+                if (!user.is_active) {
+                    if (!confirm(`Czy na pewno aktywować użytkownika ${user.first_name} ${user.last_name}?`)) return;
+
+                    try {
+                        await axios.put(`/api/users/${user.id}`, {
+                            is_active: true
+                        });
+                        showToast('Użytkownik aktywowany', 'success');
+                        loadUsers();
+                        loadManagers();
+                    } catch (err) {
+                        showToast(err.response?.data?.error || 'Błąd aktywacji', 'error');
+                    }
+                    return;
+                }
+
+                // If deactivating, check for subordinates first
+                try {
+                    const res = await axios.get(`/api/users/${user.id}/subordinates`);
+
+                    if (res.data.count > 0) {
+                        // Show reassignment modal
+                        setReassignModal({
+                            user: user,
+                            subordinates: res.data.subordinates
+                        });
+                        setNewSupervisorId(null);
+                    } else {
+                        // No subordinates, just deactivate
+                        if (!confirm(`Czy na pewno deaktywować użytkownika ${user.first_name} ${user.last_name}?`)) return;
+
+                        await axios.put(`/api/users/${user.id}`, {
+                            is_active: false
+                        });
+                        showToast('Użytkownik deaktywowany', 'success');
+                        loadUsers();
+                        loadManagers();
+                    }
+                } catch (err) {
+                    showToast(err.response?.data?.error || 'Błąd deaktywacji', 'error');
+                }
+            };
+
+            const handleReassignAndDeactivate = async () => {
+                if (!newSupervisorId) {
+                    showToast('Wybierz nowego przełożonego', 'error');
+                    return;
+                }
+
+                try {
+                    // Reassign subordinates
+                    await axios.post(`/api/users/${reassignModal.user.id}/reassign-subordinates`, {
+                        new_supervisor_id: parseInt(newSupervisorId)
+                    });
+
+                    // Deactivate user
+                    await axios.put(`/api/users/${reassignModal.user.id}`, {
+                        is_active: false
+                    });
+
+                    showToast(`Pracownicy przepisani i użytkownik deaktywowany`, 'success');
+                    setReassignModal(null);
+                    setNewSupervisorId(null);
+                    loadUsers();
+                    loadManagers();
+                } catch (err) {
+                    showToast(err.response?.data?.error || 'Błąd przepisywania', 'error');
+                }
+            };
+
             if (loading) return <LoadingSpinner />;
 
             const roleLabels = {
@@ -971,6 +1045,7 @@
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Email</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Rola</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Przełożony</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Akcje</th>
                                 </tr>
                             </thead>
@@ -988,6 +1063,11 @@
                                             {user.supervisor ? user.supervisor.name : '-'}
                                         </td>
                                         <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${user.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                                {user.is_active ? 'Aktywny' : 'Nieaktywny'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => setEditModal(user)}
@@ -996,8 +1076,15 @@
                                                     Edytuj
                                                 </button>
                                                 <button
+                                                    onClick={() => handleToggleActive(user)}
+                                                    className={`px-3 py-1 ${user.is_active ? 'bg-orange-500 hover:bg-orange-600' : 'bg-green-500 hover:bg-green-600'} text-white rounded-lg transition text-sm`}
+                                                >
+                                                    {user.is_active ? 'Deaktywuj' : 'Aktywuj'}
+                                                </button>
+                                                <button
                                                     onClick={() => handleDelete(user.id)}
                                                     className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm"
+                                                    title="Usuwa tylko użytkowników bez wniosków"
                                                 >
                                                     Usuń
                                                 </button>
@@ -1077,7 +1164,7 @@
                                             className="w-full px-4 py-2 border rounded-lg"
                                         >
                                             <option value="">Brak przełożonego</option>
-                                            {managers.map(m => (
+                                            {managers.filter(m => m.is_active).map(m => (
                                                 <option key={m.id} value={m.id}>{m.first_name} {m.last_name} ({m.role})</option>
                                             ))}
                                         </select>
@@ -1168,7 +1255,7 @@
                                             className="w-full px-4 py-2 border rounded-lg"
                                         >
                                             <option value="">Brak przełożonego</option>
-                                            {managers.filter(m => m.id !== editModal.id).map(m => (
+                                            {managers.filter(m => m.is_active && m.id !== editModal.id).map(m => (
                                                 <option key={m.id} value={m.id}>{m.first_name} {m.last_name} ({m.role})</option>
                                             ))}
                                         </select>
@@ -1189,6 +1276,68 @@
                                         </button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Reassign Subordinates Modal */}
+                    {reassignModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div className="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                                <h3 className="text-2xl font-bold mb-4 text-orange-600">⚠️ Przepisz pracowników</h3>
+
+                                <div className="mb-6 p-4 bg-orange-50 border-l-4 border-orange-500 rounded">
+                                    <p className="font-semibold mb-2">
+                                        Użytkownik <span className="text-orange-700">{reassignModal.user.first_name} {reassignModal.user.last_name}</span> jest przełożonym dla <span className="text-orange-700">{reassignModal.subordinates.length}</span> pracowników:
+                                    </p>
+                                    <ul className="list-disc list-inside space-y-1 text-sm">
+                                        {reassignModal.subordinates.map(sub => (
+                                            <li key={sub.id}>{sub.first_name} {sub.last_name} ({sub.email})</li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <p className="mb-4 text-gray-700">
+                                    Aby deaktywować tego użytkownika, musisz najpierw przypisać nowego przełożonego dla tych pracowników:
+                                </p>
+
+                                <div className="mb-6">
+                                    <label className="block text-sm font-semibold mb-2">Nowy przełożony *</label>
+                                    <select
+                                        value={newSupervisorId || ''}
+                                        onChange={(e) => setNewSupervisorId(e.target.value)}
+                                        className="w-full px-4 py-2 border rounded-lg"
+                                        required
+                                    >
+                                        <option value="">-- Wybierz przełożonego --</option>
+                                        {managers.filter(m => m.is_active && m.id !== reassignModal.user.id).map(m => (
+                                            <option key={m.id} value={m.id}>
+                                                {m.first_name} {m.last_name} ({m.role})
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Wszyscy powyżsi pracownicy zostaną przypisani do wybranego przełożonego
+                                    </p>
+                                </div>
+
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={handleReassignAndDeactivate}
+                                        className="flex-1 px-6 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 transition"
+                                    >
+                                        Przepisz i deaktywuj
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setReassignModal(null);
+                                            setNewSupervisorId(null);
+                                        }}
+                                        className="flex-1 px-6 py-3 bg-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-400 transition"
+                                    >
+                                        Anuluj
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}
