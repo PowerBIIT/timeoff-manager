@@ -18,23 +18,48 @@
     <!-- Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-    <!-- Google Fonts - Inter -->
+    <!-- Google Fonts - Poppins & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
         * {
             font-family: 'Inter', sans-serif;
         }
 
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
         }
 
+        /* Modern color palette */
+        :root {
+            --primary: #0F172A;
+            --accent: #10B981;
+            --bg-light: #F8FAFC;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+        }
+
+        .gradient-emerald {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        }
+
+        .gradient-slate {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Loading spinner */
         .loading-spinner {
             border: 3px solid #f3f4f6;
-            border-top: 3px solid #667eea;
+            border-top: 3px solid #10B981;
             border-radius: 50%;
             width: 24px;
             height: 24px;
@@ -46,6 +71,7 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Toast animations */
         .toast {
             position: fixed;
             top: 20px;
@@ -64,9 +90,162 @@
                 opacity: 1;
             }
         }
+
+        /* Smooth transitions */
+        * {
+            transition: all 0.2s ease;
+        }
+
+        /* Mobile bottom nav */
+        .mobile-nav {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-sidebar {
+                display: none;
+            }
+
+            .mobile-nav {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 50;
+                background: white;
+                border-top: 1px solid #E2E8F0;
+                padding: 8px 0;
+                box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .mobile-nav-item {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 8px;
+                font-size: 11px;
+                color: #64748B;
+                text-decoration: none;
+                gap: 4px;
+            }
+
+            .mobile-nav-item.active {
+                color: #10B981;
+            }
+
+            .mobile-nav-icon {
+                font-size: 20px;
+            }
+
+            .content-wrapper {
+                padding-bottom: 80px;
+            }
+        }
+
+        /* Card hover effect */
+        .hover-lift {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Status pulse animation */
+        @keyframes pulse-glow {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+
+        .status-pulse {
+            animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            z-index: 40;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .fab {
+                display: none;
+            }
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Improved mobile modal */
+        @media (max-width: 768px) {
+            .modal-content {
+                border-radius: 24px 24px 0 0;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+        }
     </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0F172A',
+                        accent: '#10B981',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
 </head>
-<body>
+<body class="bg-gray-50">
     <div id="root"></div>
 
     <script type="text/babel">
@@ -93,17 +272,17 @@
             }, [onClose]);
 
             const colors = {
-                success: 'bg-green-500',
+                success: 'bg-emerald-500',
                 error: 'bg-red-500',
-                warning: 'bg-yellow-500',
+                warning: 'bg-amber-500',
                 info: 'bg-blue-500'
             };
 
             return (
-                <div className={`toast ${colors[type]} text-white px-6 py-4 rounded-xl shadow-2xl max-w-md`}>
+                <div className={`toast ${colors[type]} text-white px-6 py-4 rounded-2xl shadow-2xl max-w-md`}>
                     <div className="flex items-center gap-3">
-                        <span className="text-lg font-semibold">{message}</span>
-                        <button onClick={onClose} className="ml-4 text-white hover:text-gray-200">
+                        <span className="font-medium">{message}</span>
+                        <button onClick={onClose} className="ml-4 text-white hover:text-gray-200 text-xl">
                             ✕
                         </button>
                     </div>
@@ -115,10 +294,57 @@
         // LOADING SPINNER
         // ============================================
         const LoadingSpinner = () => (
-            <div className="flex justify-center items-center py-8">
+            <div className="flex justify-center items-center py-12">
                 <div className="loading-spinner"></div>
             </div>
         );
+
+        // ============================================
+        // ICONS (SVG Components)
+        // ============================================
+        const Icons = {
+            Dashboard: () => (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+            ),
+            Plus: () => (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+            ),
+            Calendar: () => (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            ),
+            Clock: () => (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            ),
+            Users: () => (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            ),
+            Settings: () => (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            ),
+            List: () => (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+            ),
+            Menu: () => (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            ),
+        };
 
         // ============================================
         // LOGIN VIEW
@@ -147,39 +373,44 @@
             };
 
             return (
-                <div className="min-h-screen flex items-center justify-center gradient-bg p-4">
-                    <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
-                        <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                            TimeOff Manager
-                        </h1>
-                        <p className="text-center text-gray-500 mb-8">Zaloguj się do systemu</p>
+                <div className="min-h-screen flex items-center justify-center gradient-slate p-4">
+                    <div className="glass rounded-3xl shadow-2xl p-8 w-full max-w-md border border-white/20">
+                        <div className="text-center mb-8">
+                            <div className="w-20 h-20 mx-auto mb-4 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
+                                <Icons.Calendar />
+                            </div>
+                            <h1 className="text-4xl font-bold mb-2 text-white">
+                                TimeOff
+                            </h1>
+                            <p className="text-slate-300">System zarządzania wnioskami</p>
+                        </div>
 
                         {error && (
-                            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
-                                <p className="text-red-700">{error}</p>
+                            <div className="bg-red-500/10 border border-red-500/20 backdrop-blur p-4 mb-6 rounded-xl">
+                                <p className="text-red-200 text-sm">{error}</p>
                             </div>
                         )}
 
-                        <form onSubmit={handleLogin}>
-                            <div className="mb-4">
-                                <label className="block text-gray-700 font-semibold mb-2">Email</label>
+                        <form onSubmit={handleLogin} className="space-y-4">
+                            <div>
+                                <label className="block text-slate-200 font-medium mb-2 text-sm">Email</label>
                                 <input
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white placeholder-slate-400"
                                     placeholder="email@firma.pl"
                                     required
                                 />
                             </div>
 
-                            <div className="mb-6">
-                                <label className="block text-gray-700 font-semibold mb-2">Hasło</label>
+                            <div>
+                                <label className="block text-slate-200 font-medium mb-2 text-sm">Hasło</label>
                                 <input
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white placeholder-slate-400"
                                     placeholder="••••••••"
                                     required
                                 />
@@ -188,7 +419,7 @@
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full px-6 py-3 gradient-bg text-white rounded-xl font-semibold hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                                className="w-full px-6 py-3 gradient-emerald text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
                             >
                                 {loading ? (
                                     <>
@@ -199,11 +430,11 @@
                             </button>
                         </form>
 
-                        <div className="mt-6 p-4 bg-gray-50 rounded-xl">
-                            <p className="text-xs text-gray-600 mb-2 font-semibold">Konta testowe:</p>
-                            <p className="text-xs text-gray-500">Admin: admin@firma.pl / admin123</p>
-                            <p className="text-xs text-gray-500">Manager: manager@firma.pl / manager123</p>
-                            <p className="text-xs text-gray-500">Pracownik: jan@firma.pl / jan123</p>
+                        <div className="mt-6 p-4 bg-white/5 backdrop-blur rounded-xl border border-white/10">
+                            <p className="text-xs text-slate-300 mb-2 font-semibold">Konta testowe:</p>
+                            <p className="text-xs text-slate-400">Admin: admin@firma.pl / admin123</p>
+                            <p className="text-xs text-slate-400">Manager: manager@firma.pl / manager123</p>
+                            <p className="text-xs text-slate-400">Pracownik: jan@firma.pl / jan123</p>
                         </div>
                     </div>
                 </div>
@@ -211,20 +442,51 @@
         };
 
         // ============================================
-        // NAVBAR
+        // MOBILE HEADER
         // ============================================
-        const Navbar = ({ user, onLogout }) => {
-            const handleLogout = async () => {
-                try {
-                    await axios.post('/api/logout');
-                } catch (err) {
-                    console.error('Logout error:', err);
-                } finally {
-                    localStorage.removeItem('token');
-                    delete axios.defaults.headers.common['Authorization'];
-                    onLogout();
-                }
+        const MobileHeader = ({ user, onMenuClick, onLogout }) => {
+            const roleLabels = {
+                'pracownik': 'Pracownik',
+                'manager': 'Manager',
+                'admin': 'Admin'
             };
+
+            return (
+                <div className="md:hidden gradient-slate text-white px-4 py-4 shadow-lg sticky top-0 z-40">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <button onClick={onMenuClick} className="p-2 hover:bg-white/10 rounded-lg">
+                                <Icons.Menu />
+                            </button>
+                            <div>
+                                <h1 className="text-xl font-bold">TimeOff</h1>
+                                <p className="text-xs text-slate-300">{user.first_name} {user.last_name}</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={onLogout}
+                            className="text-sm px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg"
+                        >
+                            Wyloguj
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        // ============================================
+        // SIDEBAR (Desktop)
+        // ============================================
+        const Sidebar = ({ activeView, setView, role, user, onLogout, mobileOpen, setMobileOpen }) => {
+            const menuItems = [
+                { id: 'dashboard', label: 'Dashboard', icon: Icons.Dashboard, roles: ['pracownik', 'manager', 'admin'] },
+                { id: 'new-request', label: 'Nowy wniosek', icon: Icons.Plus, roles: ['pracownik', 'manager', 'admin'] },
+                { id: 'my-requests', label: 'Moje wnioski', icon: Icons.Calendar, roles: ['pracownik', 'manager', 'admin'] },
+                { id: 'pending', label: 'Oczekujące', icon: Icons.Clock, roles: ['manager', 'admin'] },
+                { id: 'users', label: 'Użytkownicy', icon: Icons.Users, roles: ['admin'] },
+                { id: 'settings', label: 'Ustawienia', icon: Icons.Settings, roles: ['admin'] },
+                { id: 'audit', label: 'Audit Log', icon: Icons.List, roles: ['admin'] },
+            ];
 
             const roleLabels = {
                 'pracownik': 'Pracownik',
@@ -232,62 +494,101 @@
                 'admin': 'Administrator'
             };
 
+            const handleNavClick = (itemId) => {
+                setView(itemId);
+                setMobileOpen(false);
+            };
+
             return (
-                <nav className="gradient-bg text-white px-6 py-4 shadow-lg">
-                    <div className="max-w-7xl mx-auto flex justify-between items-center">
-                        <div>
-                            <h1 className="text-2xl font-bold">TimeOff Manager</h1>
-                            <p className="text-sm opacity-90">System zarządzania wnioskami</p>
-                        </div>
-                        <div className="flex items-center gap-6">
-                            <div className="text-right">
-                                <p className="font-semibold">{user.first_name} {user.last_name}</p>
-                                <p className="text-sm opacity-90">{roleLabels[user.role]}</p>
+                <>
+                    {/* Mobile overlay */}
+                    {mobileOpen && (
+                        <div
+                            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                            onClick={() => setMobileOpen(false)}
+                        ></div>
+                    )}
+
+                    {/* Sidebar */}
+                    <div className={`
+                        desktop-sidebar
+                        fixed md:sticky top-0 h-screen
+                        w-72 bg-white shadow-xl
+                        transform transition-transform duration-300 z-50
+                        ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+                    `}>
+                        <div className="p-6 border-b border-gray-100">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+                                    <Icons.Calendar />
+                                </div>
+                                <div>
+                                    <h1 className="text-xl font-bold text-gray-800">TimeOff</h1>
+                                    <p className="text-xs text-gray-500">Manager</p>
+                                </div>
                             </div>
+                            <div className="bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-xl p-3 border border-emerald-200">
+                                <p className="font-semibold text-sm text-gray-800">{user.first_name} {user.last_name}</p>
+                                <p className="text-xs text-emerald-700">{roleLabels[user.role]}</p>
+                            </div>
+                        </div>
+
+                        <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
+                            {menuItems.filter(item => item.roles.includes(role)).map(item => {
+                                const Icon = item.icon;
+                                return (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => handleNavClick(item.id)}
+                                        className={`w-full text-left px-4 py-3 rounded-xl transition flex items-center gap-3 ${
+                                            activeView === item.id
+                                                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
+                                                : 'hover:bg-gray-100 text-gray-700'
+                                        }`}
+                                    >
+                                        <Icon />
+                                        <span className="font-medium">{item.label}</span>
+                                    </button>
+                                );
+                            })}
+                        </nav>
+
+                        <div className="p-4 border-t border-gray-100 hidden md:block">
                             <button
-                                onClick={handleLogout}
-                                className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition"
+                                onClick={onLogout}
+                                className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition font-medium"
                             >
-                                Wyloguj
+                                Wyloguj się
                             </button>
                         </div>
                     </div>
-                </nav>
+                </>
             );
         };
 
         // ============================================
-        // SIDEBAR
+        // MOBILE BOTTOM NAV
         // ============================================
-        const Sidebar = ({ activeView, setView, role }) => {
-            const menuItems = [
-                { id: 'dashboard', label: 'Dashboard', icon: '📊', roles: ['pracownik', 'manager', 'admin'] },
-                { id: 'new-request', label: 'Nowy wniosek', icon: '➕', roles: ['pracownik', 'manager', 'admin'] },
-                { id: 'my-requests', label: 'Moje wnioski', icon: '📝', roles: ['pracownik', 'manager', 'admin'] },
+        const MobileBottomNav = ({ activeView, setView, role }) => {
+            const navItems = [
+                { id: 'dashboard', label: 'Home', icon: '🏠', roles: ['pracownik', 'manager', 'admin'] },
+                { id: 'my-requests', label: 'Wnioski', icon: '📋', roles: ['pracownik', 'manager', 'admin'] },
                 { id: 'pending', label: 'Oczekujące', icon: '⏳', roles: ['manager', 'admin'] },
                 { id: 'users', label: 'Użytkownicy', icon: '👥', roles: ['admin'] },
-                { id: 'settings', label: 'Ustawienia', icon: '⚙️', roles: ['admin'] },
-                { id: 'audit', label: 'Audit Log', icon: '📜', roles: ['admin'] },
-            ];
+            ].filter(item => item.roles.includes(role));
 
             return (
-                <div className="w-64 bg-white shadow-lg min-h-screen p-4">
-                    <nav className="space-y-2">
-                        {menuItems.filter(item => item.roles.includes(role)).map(item => (
-                            <button
-                                key={item.id}
-                                onClick={() => setView(item.id)}
-                                className={`w-full text-left px-4 py-3 rounded-xl transition flex items-center gap-3 ${
-                                    activeView === item.id
-                                        ? 'gradient-bg text-white shadow-lg'
-                                        : 'hover:bg-gray-100 text-gray-700'
-                                }`}
-                            >
-                                <span className="text-xl">{item.icon}</span>
-                                <span className="font-semibold">{item.label}</span>
-                            </button>
-                        ))}
-                    </nav>
+                <div className="mobile-nav">
+                    {navItems.map(item => (
+                        <button
+                            key={item.id}
+                            onClick={() => setView(item.id)}
+                            className={`mobile-nav-item ${activeView === item.id ? 'active' : ''}`}
+                        >
+                            <span className="mobile-nav-icon">{item.icon}</span>
+                            <span className="font-medium">{item.label}</span>
+                        </button>
+                    ))}
                 </div>
             );
         };
@@ -349,14 +650,18 @@
             const StatCard = ({ title, value, color, icon, filter }) => (
                 <div
                     onClick={() => handleCardClick(filter)}
-                    className={`bg-white rounded-2xl shadow-lg p-6 border-l-4 border-${color}-500 cursor-pointer transition-all hover:shadow-xl hover:scale-105 ${selectedFilter === filter ? 'ring-4 ring-' + color + '-300' : ''}`}
+                    className={`glass rounded-2xl shadow-lg p-6 border border-gray-100 cursor-pointer hover-lift ${
+                        selectedFilter === filter ? 'ring-4 ring-' + color + '-300 ring-offset-2' : ''
+                    }`}
                 >
                     <div className="flex justify-between items-start">
                         <div>
-                            <p className="text-gray-500 text-sm font-semibold mb-1">{title}</p>
+                            <p className="text-gray-500 text-sm font-medium mb-2">{title}</p>
                             <p className={`text-4xl font-bold text-${color}-600`}>{value}</p>
                         </div>
-                        <span className="text-4xl opacity-20">{icon}</span>
+                        <div className={`w-12 h-12 bg-${color}-100 rounded-xl flex items-center justify-center`}>
+                            <span className="text-2xl">{icon}</span>
+                        </div>
                     </div>
                     {selectedFilter === filter && (
                         <div className="mt-3 text-xs text-gray-500 font-medium">
@@ -367,73 +672,75 @@
             );
 
             const statusColors = {
-                'oczekujący': 'bg-yellow-100 text-yellow-800',
-                'zaakceptowany': 'bg-green-100 text-green-800',
-                'odrzucony': 'bg-red-100 text-red-800',
+                'oczekujący': 'bg-amber-100 text-amber-800 border-amber-200',
+                'zaakceptowany': 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'odrzucony': 'bg-red-100 text-red-800 border-red-200',
             };
 
             const filteredRequests = getFilteredRequests();
 
             return (
-                <div className="p-8">
-                    <h2 className="text-3xl font-bold mb-2">Witaj, {user.first_name}!</h2>
-                    <p className="text-gray-500 mb-8">Oto podsumowanie Twoich wniosków</p>
+                <div className="p-4 md:p-8 content-wrapper">
+                    <div className="mb-8">
+                        <h2 className="text-3xl font-bold mb-1 text-gray-800">Witaj, {user.first_name}! 👋</h2>
+                        <p className="text-gray-500">Oto podsumowanie Twoich wniosków</p>
+                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <StatCard title="Wszystkie wnioski" value={stats?.total || 0} color="blue" icon="📊" filter="all" />
-                        <StatCard title="Oczekujące" value={stats?.pending || 0} color="yellow" icon="⏳" filter="pending" />
-                        <StatCard title="Zaakceptowane" value={stats?.approved || 0} color="green" icon="✅" filter="approved" />
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+                        <StatCard title="Wszystkie" value={stats?.total || 0} color="blue" icon="📊" filter="all" />
+                        <StatCard title="Oczekujące" value={stats?.pending || 0} color="amber" icon="⏳" filter="pending" />
+                        <StatCard title="Zaakceptowane" value={stats?.approved || 0} color="emerald" icon="✅" filter="approved" />
                         <StatCard title="Odrzucone" value={stats?.rejected || 0} color="red" icon="❌" filter="rejected" />
                     </div>
 
                     {selectedFilter && (
                         <div className="mt-8">
-                            <h3 className="text-2xl font-bold mb-4">
+                            <h3 className="text-2xl font-bold mb-4 text-gray-800">
                                 {selectedFilter === 'all' && 'Wszystkie wnioski'}
                                 {selectedFilter === 'pending' && 'Wnioski oczekujące'}
                                 {selectedFilter === 'approved' && 'Wnioski zaakceptowane'}
                                 {selectedFilter === 'rejected' && 'Wnioski odrzucone'}
-                                {' '}({filteredRequests.length})
+                                <span className="text-gray-400 ml-2">({filteredRequests.length})</span>
                             </h3>
 
                             {filteredRequests.length === 0 ? (
-                                <div className="text-center py-12 bg-white rounded-2xl shadow">
+                                <div className="text-center py-12 glass rounded-2xl shadow">
                                     <p className="text-gray-400 text-lg">Brak wniosków w tej kategorii</p>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
                                     {filteredRequests.map(req => (
-                                        <div key={req.id} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-                                            <div className="flex justify-between items-start">
+                                        <div key={req.id} className="glass rounded-2xl shadow-lg p-4 md:p-6 hover-lift border border-gray-100">
+                                            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
                                                 <div className="flex-1">
-                                                    <div className="flex items-center gap-3 mb-3">
-                                                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColors[req.status]}`}>
+                                                    <div className="flex items-center gap-3 mb-3 flex-wrap">
+                                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${statusColors[req.status]}`}>
                                                             {req.status.toUpperCase()}
                                                         </span>
-                                                        <span className="text-gray-500">#{req.id}</span>
+                                                        <span className="text-gray-400 text-sm">#{req.id}</span>
                                                     </div>
-                                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4">
                                                         <div>
-                                                            <p className="text-sm text-gray-500">Pracownik</p>
-                                                            <p className="font-semibold">{req.user_name}</p>
+                                                            <p className="text-xs text-gray-500 mb-1">Pracownik</p>
+                                                            <p className="font-semibold text-sm">{req.user_name}</p>
                                                         </div>
                                                         <div>
-                                                            <p className="text-sm text-gray-500">Data</p>
-                                                            <p className="font-semibold">{req.date}</p>
+                                                            <p className="text-xs text-gray-500 mb-1">Data</p>
+                                                            <p className="font-semibold text-sm">{req.date}</p>
                                                         </div>
                                                         <div>
-                                                            <p className="text-sm text-gray-500">Godziny</p>
-                                                            <p className="font-semibold">{req.start_time} - {req.end_time}</p>
+                                                            <p className="text-xs text-gray-500 mb-1">Godziny</p>
+                                                            <p className="font-semibold text-sm">{req.start_time} - {req.end_time}</p>
                                                         </div>
                                                         <div>
-                                                            <p className="text-sm text-gray-500">Przełożony</p>
-                                                            <p className="font-semibold">{req.supervisor_name || '-'}</p>
+                                                            <p className="text-xs text-gray-500 mb-1">Przełożony</p>
+                                                            <p className="font-semibold text-sm">{req.supervisor_name || '-'}</p>
                                                         </div>
                                                     </div>
                                                     {req.reason && (
-                                                        <div className="mt-3">
-                                                            <p className="text-sm text-gray-500">Powód</p>
-                                                            <p className="text-gray-700">{req.reason}</p>
+                                                        <div className="mt-3 bg-gray-50 rounded-xl p-3">
+                                                            <p className="text-xs text-gray-500 mb-1">Powód</p>
+                                                            <p className="text-gray-700 text-sm">{req.reason}</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -488,22 +795,22 @@
                 : requests.filter(r => r.status === filter);
 
             const statusColors = {
-                'oczekujący': 'bg-yellow-100 text-yellow-800',
-                'zaakceptowany': 'bg-green-100 text-green-800',
-                'odrzucony': 'bg-red-100 text-red-800',
-                'anulowany': 'bg-gray-100 text-gray-800'
+                'oczekujący': 'bg-amber-100 text-amber-800 border-amber-200',
+                'zaakceptowany': 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'odrzucony': 'bg-red-100 text-red-800 border-red-200',
+                'anulowany': 'bg-gray-100 text-gray-800 border-gray-200'
             };
 
             if (loading) return <LoadingSpinner />;
 
             return (
-                <div className="p-8">
-                    <div className="flex justify-between items-center mb-8">
-                        <h2 className="text-3xl font-bold">Moje wnioski</h2>
+                <div className="p-4 md:p-8 content-wrapper">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+                        <h2 className="text-3xl font-bold text-gray-800">Moje wnioski</h2>
                         <select
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
-                            className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
                         >
                             <option value="all">Wszystkie</option>
                             <option value="oczekujący">Oczekujące</option>
@@ -514,54 +821,54 @@
                     </div>
 
                     {filteredRequests.length === 0 ? (
-                        <div className="text-center py-16 bg-white rounded-2xl shadow">
+                        <div className="text-center py-16 glass rounded-2xl shadow">
                             <p className="text-gray-400 text-lg">Brak wniosków do wyświetlenia</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
                             {filteredRequests.map(req => (
-                                <div key={req.id} className="bg-white rounded-2xl shadow-lg p-6">
-                                    <div className="flex justify-between items-start">
+                                <div key={req.id} className="glass rounded-2xl shadow-lg p-4 md:p-6 border border-gray-100">
+                                    <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
                                         <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-3">
-                                                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColors[req.status]}`}>
+                                            <div className="flex items-center gap-3 mb-3 flex-wrap">
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${statusColors[req.status]}`}>
                                                     {req.status.toUpperCase()}
                                                 </span>
-                                                <span className="text-gray-500">#{req.id}</span>
+                                                <span className="text-gray-400 text-sm">#{req.id}</span>
                                             </div>
-                                            <div className="grid grid-cols-2 gap-4 mb-3">
+                                            <div className="grid grid-cols-2 gap-3 mb-3">
                                                 <div>
-                                                    <p className="text-sm text-gray-500">Data</p>
-                                                    <p className="font-semibold">{req.date}</p>
+                                                    <p className="text-xs text-gray-500 mb-1">Data</p>
+                                                    <p className="font-semibold text-sm">{req.date}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-gray-500">Godziny</p>
-                                                    <p className="font-semibold">{req.time_out} - {req.time_return}</p>
+                                                    <p className="text-xs text-gray-500 mb-1">Godziny</p>
+                                                    <p className="font-semibold text-sm">{req.time_out} - {req.time_return}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-gray-500">Przełożony</p>
-                                                    <p className="font-semibold">{req.manager.name}</p>
+                                                    <p className="text-xs text-gray-500 mb-1">Przełożony</p>
+                                                    <p className="font-semibold text-sm">{req.manager.name}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-gray-500">Utworzono</p>
-                                                    <p className="font-semibold">{new Date(req.created_at).toLocaleDateString('pl-PL')}</p>
+                                                    <p className="text-xs text-gray-500 mb-1">Utworzono</p>
+                                                    <p className="font-semibold text-sm">{new Date(req.created_at).toLocaleDateString('pl-PL')}</p>
                                                 </div>
                                             </div>
                                             <div className="bg-gray-50 p-3 rounded-xl">
-                                                <p className="text-sm text-gray-500 mb-1">Powód</p>
-                                                <p className="text-gray-800">{req.reason}</p>
+                                                <p className="text-xs text-gray-500 mb-1">Powód</p>
+                                                <p className="text-gray-800 text-sm">{req.reason}</p>
                                             </div>
                                             {req.manager_comment && (
-                                                <div className="bg-red-50 p-3 rounded-xl mt-3 border-l-4 border-red-500">
-                                                    <p className="text-sm text-red-700 mb-1 font-semibold">Komentarz managera</p>
-                                                    <p className="text-red-900">{req.manager_comment}</p>
+                                                <div className="bg-red-50 p-3 rounded-xl mt-3 border border-red-200">
+                                                    <p className="text-xs text-red-700 mb-1 font-semibold">Komentarz managera</p>
+                                                    <p className="text-red-900 text-sm">{req.manager_comment}</p>
                                                 </div>
                                             )}
                                         </div>
                                         {req.status === 'oczekujący' && (
                                             <button
                                                 onClick={() => handleCancel(req.id)}
-                                                className="ml-4 px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition"
+                                                className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition font-medium text-sm w-full md:w-auto"
                                             >
                                                 Anuluj
                                             </button>
@@ -590,7 +897,6 @@
             const handleSubmit = async (e) => {
                 e.preventDefault();
 
-                // Validation
                 if (form.time_return <= form.time_out) {
                     showToast('Godzina powrotu musi być późniejsza niż wyjście!', 'error');
                     return;
@@ -621,52 +927,52 @@
             };
 
             return (
-                <div className="p-8 max-w-3xl mx-auto">
-                    <h2 className="text-3xl font-bold mb-8">Nowy wniosek o wyjście</h2>
-                    <p className="mb-6 text-gray-600">Wniosek zostanie automatycznie wysłany do Twojego przełożonego</p>
+                <div className="p-4 md:p-8 max-w-3xl mx-auto content-wrapper">
+                    <h2 className="text-3xl font-bold mb-2 text-gray-800">Nowy wniosek</h2>
+                    <p className="mb-6 text-gray-500">Wniosek zostanie automatycznie wysłany do Twojego przełożonego</p>
 
-                    <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8 space-y-6">
+                    <form onSubmit={handleSubmit} className="glass rounded-2xl shadow-lg p-4 md:p-8 space-y-6 border border-gray-100">
                         <div>
-                            <label className="block font-semibold mb-2 text-gray-700">Data *</label>
+                            <label className="block font-semibold mb-2 text-gray-700 text-sm">Data *</label>
                             <input
                                 type="date"
                                 value={form.date}
                                 onChange={(e) => setForm({...form, date: e.target.value})}
                                 min={new Date().toISOString().split('T')[0]}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 required
                             />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block font-semibold mb-2 text-gray-700">Wyjście *</label>
+                                <label className="block font-semibold mb-2 text-gray-700 text-sm">Wyjście *</label>
                                 <input
                                     type="time"
                                     value={form.time_out}
                                     onChange={(e) => setForm({...form, time_out: e.target.value})}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block font-semibold mb-2 text-gray-700">Powrót *</label>
+                                <label className="block font-semibold mb-2 text-gray-700 text-sm">Powrót *</label>
                                 <input
                                     type="time"
                                     value={form.time_return}
                                     onChange={(e) => setForm({...form, time_return: e.target.value})}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                     required
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block font-semibold mb-2 text-gray-700">Powód * (min. 10 znaków)</label>
+                            <label className="block font-semibold mb-2 text-gray-700 text-sm">Powód * (min. 10 znaków)</label>
                             <textarea
                                 value={form.reason}
                                 onChange={(e) => setForm({...form, reason: e.target.value})}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 rows="4"
                                 placeholder="Opisz powód wyjścia..."
                                 required
@@ -678,7 +984,7 @@
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full px-6 py-3 gradient-bg text-white rounded-xl font-semibold hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="w-full px-6 py-3 gradient-emerald text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/30 transition disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             {loading ? (
                                 <>
@@ -749,57 +1055,57 @@
             if (loading) return <LoadingSpinner />;
 
             return (
-                <div className="p-8">
-                    <h2 className="text-3xl font-bold mb-2">
+                <div className="p-4 md:p-8 content-wrapper">
+                    <h2 className="text-3xl font-bold mb-2 text-gray-800">
                         Oczekujące wnioski
-                        <span className="ml-4 text-yellow-600">({requests.length})</span>
+                        <span className="ml-4 text-amber-600">({requests.length})</span>
                     </h2>
-                    <p className="text-gray-500 mb-8">Wnioski wymagające Twojej decyzji</p>
+                    <p className="text-gray-500 mb-6">Wnioski wymagające Twojej decyzji</p>
 
                     {requests.length === 0 ? (
-                        <div className="text-center py-16 bg-white rounded-2xl shadow">
+                        <div className="text-center py-16 glass rounded-2xl shadow border border-gray-100">
                             <p className="text-gray-400 text-lg">✅ Brak oczekujących wniosków</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
                             {requests.map(req => (
-                                <div key={req.id} className="bg-white rounded-2xl shadow-lg p-6">
-                                    <div className="flex justify-between items-start gap-6">
+                                <div key={req.id} className="glass rounded-2xl shadow-lg p-4 md:p-6 border border-gray-100">
+                                    <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
                                         <div className="flex-1">
-                                            <h3 className="text-xl font-bold mb-3">{req.employee.name}</h3>
-                                            <div className="grid grid-cols-2 gap-4 mb-3">
+                                            <h3 className="text-xl font-bold mb-3 text-gray-800">{req.employee.name}</h3>
+                                            <div className="grid grid-cols-2 gap-3 mb-3">
                                                 <div>
-                                                    <p className="text-sm text-gray-500">Data</p>
-                                                    <p className="font-semibold">{req.date}</p>
+                                                    <p className="text-xs text-gray-500 mb-1">Data</p>
+                                                    <p className="font-semibold text-sm">{req.date}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-gray-500">Godziny</p>
-                                                    <p className="font-semibold">{req.time_out} - {req.time_return}</p>
+                                                    <p className="text-xs text-gray-500 mb-1">Godziny</p>
+                                                    <p className="font-semibold text-sm">{req.time_out} - {req.time_return}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-gray-500">Email</p>
-                                                    <p className="font-semibold">{req.employee.email}</p>
+                                                    <p className="text-xs text-gray-500 mb-1">Email</p>
+                                                    <p className="font-semibold text-sm">{req.employee.email}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-gray-500">Złożono</p>
-                                                    <p className="font-semibold">{new Date(req.created_at).toLocaleDateString('pl-PL')}</p>
+                                                    <p className="text-xs text-gray-500 mb-1">Złożono</p>
+                                                    <p className="font-semibold text-sm">{new Date(req.created_at).toLocaleDateString('pl-PL')}</p>
                                                 </div>
                                             </div>
-                                            <div className="bg-yellow-50 p-4 rounded-xl border-l-4 border-yellow-500">
-                                                <p className="text-sm text-yellow-700 mb-1 font-semibold">Powód</p>
-                                                <p className="text-yellow-900">{req.reason}</p>
+                                            <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                                                <p className="text-xs text-amber-700 mb-1 font-semibold">Powód</p>
+                                                <p className="text-amber-900 text-sm">{req.reason}</p>
                                             </div>
                                         </div>
-                                        <div className="flex flex-col gap-2">
+                                        <div className="flex md:flex-col gap-2 w-full md:w-auto">
                                             <button
                                                 onClick={() => handleAccept(req.id)}
-                                                className="px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition font-semibold"
+                                                className="flex-1 md:flex-none px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition font-semibold text-sm"
                                             >
                                                 ✅ Zaakceptuj
                                             </button>
                                             <button
                                                 onClick={() => setRejectModal(req)}
-                                                className="px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition font-semibold"
+                                                className="flex-1 md:flex-none px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition font-semibold text-sm"
                                             >
                                                 ❌ Odrzuć
                                             </button>
@@ -813,13 +1119,13 @@
                     {/* Reject Modal */}
                     {rejectModal && (
                         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                            <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
-                                <h3 className="text-2xl font-bold mb-4">Odrzuć wniosek</h3>
+                            <div className="glass rounded-2xl shadow-2xl p-6 md:p-8 max-w-md w-full border border-gray-200 modal-content">
+                                <h3 className="text-2xl font-bold mb-4 text-gray-800">Odrzuć wniosek</h3>
                                 <p className="text-gray-600 mb-4">Wniosek od: <strong>{rejectModal.employee.name}</strong></p>
                                 <textarea
                                     value={comment}
                                     onChange={(e) => setComment(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 mb-4"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 mb-4"
                                     rows="4"
                                     placeholder="Komentarz (opcjonalny)..."
                                 ></textarea>
@@ -856,7 +1162,7 @@
             const [loading, setLoading] = useState(true);
             const [editModal, setEditModal] = useState(null);
             const [addModal, setAddModal] = useState(false);
-            const [reassignModal, setReassignModal] = useState(null); // { user, subordinates }
+            const [reassignModal, setReassignModal] = useState(null);
             const [newSupervisorId, setNewSupervisorId] = useState(null);
             const [newUser, setNewUser] = useState({
                 email: '',
@@ -946,14 +1252,11 @@
             };
 
             const handleToggleActive = async (user) => {
-                // If activating, just do it
                 if (!user.is_active) {
                     if (!confirm(`Czy na pewno aktywować użytkownika ${user.first_name} ${user.last_name}?`)) return;
 
                     try {
-                        await axios.put(`/api/users/${user.id}`, {
-                            is_active: true
-                        });
+                        await axios.put(`/api/users/${user.id}`, { is_active: true });
                         showToast('Użytkownik aktywowany', 'success');
                         loadUsers();
                         loadManagers();
@@ -963,24 +1266,19 @@
                     return;
                 }
 
-                // If deactivating, check for subordinates first
                 try {
                     const res = await axios.get(`/api/users/${user.id}/subordinates`);
 
                     if (res.data.count > 0) {
-                        // Show reassignment modal
                         setReassignModal({
                             user: user,
                             subordinates: res.data.subordinates
                         });
                         setNewSupervisorId(null);
                     } else {
-                        // No subordinates, just deactivate
                         if (!confirm(`Czy na pewno deaktywować użytkownika ${user.first_name} ${user.last_name}?`)) return;
 
-                        await axios.put(`/api/users/${user.id}`, {
-                            is_active: false
-                        });
+                        await axios.put(`/api/users/${user.id}`, { is_active: false });
                         showToast('Użytkownik deaktywowany', 'success');
                         loadUsers();
                         loadManagers();
@@ -997,15 +1295,11 @@
                 }
 
                 try {
-                    // Reassign subordinates
                     await axios.post(`/api/users/${reassignModal.user.id}/reassign-subordinates`, {
                         new_supervisor_id: parseInt(newSupervisorId)
                     });
 
-                    // Deactivate user
-                    await axios.put(`/api/users/${reassignModal.user.id}`, {
-                        is_active: false
-                    });
+                    await axios.put(`/api/users/${reassignModal.user.id}`, { is_active: false });
 
                     showToast(`Pracownicy przepisani i użytkownik deaktywowany`, 'success');
                     setReassignModal(null);
@@ -1022,22 +1316,26 @@
             const roleLabels = {
                 'pracownik': 'Pracownik',
                 'manager': 'Manager',
-                'admin': 'Administrator'
+                'admin': 'Admin'
             };
 
             return (
-                <div className="p-8">
-                    <div className="flex justify-between items-center mb-8">
-                        <h2 className="text-3xl font-bold">Użytkownicy ({users.length})</h2>
+                <div className="p-4 md:p-8 content-wrapper">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+                        <h2 className="text-3xl font-bold text-gray-800">Użytkownicy <span className="text-gray-400">({users.length})</span></h2>
                         <button
                             onClick={() => setAddModal(true)}
-                            className="px-6 py-3 gradient-bg text-white rounded-xl font-semibold hover:opacity-90 transition"
+                            className="px-6 py-3 gradient-emerald text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/30 transition"
                         >
-                            ➕ Dodaj użytkownika
+                            <span className="flex items-center gap-2 justify-center">
+                                <Icons.Plus />
+                                <span>Dodaj użytkownika</span>
+                            </span>
                         </button>
                     </div>
 
-                    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    {/* Desktop Table */}
+                    <div className="hidden md:block glass rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                         <table className="w-full">
                             <thead className="bg-gray-50">
                                 <tr>
@@ -1055,7 +1353,7 @@
                                         <td className="px-6 py-4 font-semibold">{user.first_name} {user.last_name}</td>
                                         <td className="px-6 py-4 text-gray-600">{user.email}</td>
                                         <td className="px-6 py-4">
-                                            <span className="px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-800">
+                                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
                                                 {roleLabels[user.role]}
                                             </span>
                                         </td>
@@ -1063,7 +1361,7 @@
                                             {user.supervisor ? user.supervisor.name : '-'}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${user.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${user.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800'}`}>
                                                 {user.is_active ? 'Aktywny' : 'Nieaktywny'}
                                             </span>
                                         </td>
@@ -1077,7 +1375,7 @@
                                                 </button>
                                                 <button
                                                     onClick={() => handleToggleActive(user)}
-                                                    className={`px-3 py-1 ${user.is_active ? 'bg-orange-500 hover:bg-orange-600' : 'bg-green-500 hover:bg-green-600'} text-white rounded-lg transition text-sm`}
+                                                    className={`px-3 py-1 ${user.is_active ? 'bg-orange-500 hover:bg-orange-600' : 'bg-emerald-500 hover:bg-emerald-600'} text-white rounded-lg transition text-sm`}
                                                 >
                                                     {user.is_active ? 'Deaktywuj' : 'Aktywuj'}
                                                 </button>
@@ -1096,60 +1394,95 @@
                         </table>
                     </div>
 
+                    {/* Mobile Cards */}
+                    <div className="md:hidden space-y-4">
+                        {users.map(user => (
+                            <div key={user.id} className="glass rounded-2xl p-4 border border-gray-100 shadow-lg">
+                                <div className="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h3 className="font-bold text-gray-800">{user.first_name} {user.last_name}</h3>
+                                        <p className="text-sm text-gray-500">{user.email}</p>
+                                    </div>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${user.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800'}`}>
+                                        {user.is_active ? 'Aktywny' : 'Nieaktywny'}
+                                    </span>
+                                </div>
+                                <div className="space-y-2 mb-3">
+                                    <p className="text-sm"><span className="text-gray-500">Rola:</span> <span className="font-medium">{roleLabels[user.role]}</span></p>
+                                    <p className="text-sm"><span className="text-gray-500">Przełożony:</span> <span className="font-medium">{user.supervisor ? user.supervisor.name : '-'}</span></p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setEditModal(user)}
+                                        className="flex-1 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm"
+                                    >
+                                        Edytuj
+                                    </button>
+                                    <button
+                                        onClick={() => handleToggleActive(user)}
+                                        className={`flex-1 px-3 py-2 ${user.is_active ? 'bg-orange-500 hover:bg-orange-600' : 'bg-emerald-500 hover:bg-emerald-600'} text-white rounded-lg transition text-sm`}
+                                    >
+                                        {user.is_active ? 'Deaktywuj' : 'Aktywuj'}
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
                     {/* Add User Modal */}
                     {addModal && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4">
-                                <h3 className="text-2xl font-bold mb-6">Dodaj użytkownika</h3>
+                        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                            <div className="glass rounded-2xl p-6 md:p-8 max-w-md w-full border border-gray-200 modal-content max-h-[90vh] overflow-y-auto">
+                                <h3 className="text-2xl font-bold mb-6 text-gray-800">Dodaj użytkownika</h3>
                                 <form onSubmit={handleAddUser} className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-semibold mb-2">Email *</label>
+                                        <label className="block text-sm font-semibold mb-2 text-gray-700">Email *</label>
                                         <input
                                             type="email"
                                             required
                                             value={newUser.email}
                                             onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-                                            className="w-full px-4 py-2 border rounded-lg"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold mb-2">Hasło * (min. 8 znaków)</label>
+                                        <label className="block text-sm font-semibold mb-2 text-gray-700">Hasło * (min. 8 znaków)</label>
                                         <input
                                             type="password"
                                             required
                                             minLength="8"
                                             value={newUser.password}
                                             onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-                                            className="w-full px-4 py-2 border rounded-lg"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold mb-2">Imię *</label>
+                                        <label className="block text-sm font-semibold mb-2 text-gray-700">Imię *</label>
                                         <input
                                             type="text"
                                             required
                                             value={newUser.first_name}
                                             onChange={(e) => setNewUser({...newUser, first_name: e.target.value})}
-                                            className="w-full px-4 py-2 border rounded-lg"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold mb-2">Nazwisko *</label>
+                                        <label className="block text-sm font-semibold mb-2 text-gray-700">Nazwisko *</label>
                                         <input
                                             type="text"
                                             required
                                             value={newUser.last_name}
                                             onChange={(e) => setNewUser({...newUser, last_name: e.target.value})}
-                                            className="w-full px-4 py-2 border rounded-lg"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold mb-2">Rola *</label>
+                                        <label className="block text-sm font-semibold mb-2 text-gray-700">Rola *</label>
                                         <select
                                             required
                                             value={newUser.role}
                                             onChange={(e) => setNewUser({...newUser, role: e.target.value})}
-                                            className="w-full px-4 py-2 border rounded-lg"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                         >
                                             <option value="pracownik">Pracownik</option>
                                             <option value="manager">Manager</option>
@@ -1157,11 +1490,11 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold mb-2">Przełożony</label>
+                                        <label className="block text-sm font-semibold mb-2 text-gray-700">Przełożony</label>
                                         <select
                                             value={newUser.supervisor_id || ''}
                                             onChange={(e) => setNewUser({...newUser, supervisor_id: e.target.value ? parseInt(e.target.value) : null})}
-                                            className="w-full px-4 py-2 border rounded-lg"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                         >
                                             <option value="">Brak przełożonego</option>
                                             {managers.filter(m => m.is_active).map(m => (
@@ -1172,14 +1505,14 @@
                                     <div className="flex gap-3 mt-6">
                                         <button
                                             type="submit"
-                                            className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition font-semibold"
+                                            className="flex-1 px-6 py-3 gradient-emerald text-white rounded-lg hover:shadow-lg transition font-semibold"
                                         >
                                             Dodaj
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setAddModal(false)}
-                                            className="flex-1 px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-semibold"
+                                            className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold"
                                         >
                                             Anuluj
                                         </button>
@@ -1191,56 +1524,56 @@
 
                     {/* Edit User Modal */}
                     {editModal && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4">
-                                <h3 className="text-2xl font-bold mb-6">Edytuj użytkownika</h3>
+                        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                            <div className="glass rounded-2xl p-6 md:p-8 max-w-md w-full border border-gray-200 modal-content max-h-[90vh] overflow-y-auto">
+                                <h3 className="text-2xl font-bold mb-6 text-gray-800">Edytuj użytkownika</h3>
                                 <form onSubmit={handleUpdateUser} className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-semibold mb-2">Email</label>
+                                        <label className="block text-sm font-semibold mb-2 text-gray-700">Email</label>
                                         <input
                                             type="text"
                                             disabled
                                             value={editModal.email}
-                                            className="w-full px-4 py-2 border rounded-lg bg-gray-100"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold mb-2">Nowe hasło (pozostaw puste aby nie zmieniać)</label>
+                                        <label className="block text-sm font-semibold mb-2 text-gray-700">Nowe hasło (pozostaw puste aby nie zmieniać)</label>
                                         <input
                                             type="password"
                                             minLength="8"
                                             value={editModal.password || ''}
                                             onChange={(e) => setEditModal({...editModal, password: e.target.value})}
-                                            className="w-full px-4 py-2 border rounded-lg"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold mb-2">Imię *</label>
+                                        <label className="block text-sm font-semibold mb-2 text-gray-700">Imię *</label>
                                         <input
                                             type="text"
                                             required
                                             value={editModal.first_name}
                                             onChange={(e) => setEditModal({...editModal, first_name: e.target.value})}
-                                            className="w-full px-4 py-2 border rounded-lg"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold mb-2">Nazwisko *</label>
+                                        <label className="block text-sm font-semibold mb-2 text-gray-700">Nazwisko *</label>
                                         <input
                                             type="text"
                                             required
                                             value={editModal.last_name}
                                             onChange={(e) => setEditModal({...editModal, last_name: e.target.value})}
-                                            className="w-full px-4 py-2 border rounded-lg"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold mb-2">Rola *</label>
+                                        <label className="block text-sm font-semibold mb-2 text-gray-700">Rola *</label>
                                         <select
                                             required
                                             value={editModal.role}
                                             onChange={(e) => setEditModal({...editModal, role: e.target.value})}
-                                            className="w-full px-4 py-2 border rounded-lg"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                         >
                                             <option value="pracownik">Pracownik</option>
                                             <option value="manager">Manager</option>
@@ -1248,11 +1581,11 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold mb-2">Przełożony</label>
+                                        <label className="block text-sm font-semibold mb-2 text-gray-700">Przełożony</label>
                                         <select
                                             value={editModal.supervisor_id || ''}
                                             onChange={(e) => setEditModal({...editModal, supervisor_id: e.target.value ? parseInt(e.target.value) : null})}
-                                            className="w-full px-4 py-2 border rounded-lg"
+                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                         >
                                             <option value="">Brak przełożonego</option>
                                             {managers.filter(m => m.is_active && m.id !== editModal.id).map(m => (
@@ -1263,14 +1596,14 @@
                                     <div className="flex gap-3 mt-6">
                                         <button
                                             type="submit"
-                                            className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition font-semibold"
+                                            className="flex-1 px-6 py-3 gradient-emerald text-white rounded-lg hover:shadow-lg transition font-semibold"
                                         >
                                             Zapisz
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setEditModal(null)}
-                                            className="flex-1 px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-semibold"
+                                            className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold"
                                         >
                                             Anuluj
                                         </button>
@@ -1282,8 +1615,8 @@
 
                     {/* Reassign Subordinates Modal */}
                     {reassignModal && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div className="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                            <div className="glass rounded-2xl p-6 md:p-8 max-w-2xl w-full border border-gray-200 modal-content max-h-[90vh] overflow-y-auto">
                                 <h3 className="text-2xl font-bold mb-4 text-orange-600">⚠️ Przepisz pracowników</h3>
 
                                 <div className="mb-6 p-4 bg-orange-50 border-l-4 border-orange-500 rounded">
@@ -1302,11 +1635,11 @@
                                 </p>
 
                                 <div className="mb-6">
-                                    <label className="block text-sm font-semibold mb-2">Nowy przełożony *</label>
+                                    <label className="block text-sm font-semibold mb-2 text-gray-700">Nowy przełożony *</label>
                                     <select
                                         value={newSupervisorId || ''}
                                         onChange={(e) => setNewSupervisorId(e.target.value)}
-                                        className="w-full px-4 py-2 border rounded-lg"
+                                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                                         required
                                     >
                                         <option value="">-- Wybierz przełożonego --</option>
@@ -1333,7 +1666,7 @@
                                             setReassignModal(null);
                                             setNewSupervisorId(null);
                                         }}
-                                        className="flex-1 px-6 py-3 bg-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-400 transition"
+                                        className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition"
                                     >
                                         Anuluj
                                     </button>
@@ -1392,37 +1725,38 @@
             if (loading) return <LoadingSpinner />;
 
             return (
-                <div className="p-8 max-w-3xl mx-auto">
-                    <h2 className="text-3xl font-bold mb-8">Ustawienia SMTP</h2>
+                <div className="p-4 md:p-8 max-w-3xl mx-auto content-wrapper">
+                    <h2 className="text-3xl font-bold mb-2 text-gray-800">Ustawienia SMTP</h2>
+                    <p className="text-gray-500 mb-6">Skonfiguruj serwer email dla powiadomień</p>
 
-                    <form onSubmit={handleSave} className="bg-white rounded-2xl shadow-lg p-8 space-y-6">
+                    <form onSubmit={handleSave} className="glass rounded-2xl shadow-lg p-4 md:p-8 space-y-6 border border-gray-100">
                         <div>
-                            <label className="block font-semibold mb-2 text-gray-700">Server</label>
+                            <label className="block font-semibold mb-2 text-gray-700 text-sm">Server</label>
                             <input
                                 type="text"
                                 value={config.server || ''}
                                 onChange={(e) => setConfig({...config, server: e.target.value})}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 placeholder="smtp.gmail.com"
                             />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block font-semibold mb-2 text-gray-700">Port</label>
+                                <label className="block font-semibold mb-2 text-gray-700 text-sm">Port</label>
                                 <input
                                     type="number"
                                     value={config.port}
                                     onChange={(e) => setConfig({...config, port: parseInt(e.target.value)})}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 />
                             </div>
                             <div>
-                                <label className="block font-semibold mb-2 text-gray-700">Use SSL</label>
+                                <label className="block font-semibold mb-2 text-gray-700 text-sm">Use SSL</label>
                                 <select
                                     value={config.use_ssl.toString()}
                                     onChange={(e) => setConfig({...config, use_ssl: e.target.value === 'true'})}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 >
                                     <option value="true">Tak</option>
                                     <option value="false">Nie</option>
@@ -1431,34 +1765,34 @@
                         </div>
 
                         <div>
-                            <label className="block font-semibold mb-2 text-gray-700">Login</label>
+                            <label className="block font-semibold mb-2 text-gray-700 text-sm">Login</label>
                             <input
                                 type="text"
                                 value={config.login || ''}
                                 onChange={(e) => setConfig({...config, login: e.target.value})}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 placeholder="email@example.com"
                             />
                         </div>
 
                         <div>
-                            <label className="block font-semibold mb-2 text-gray-700">Password</label>
+                            <label className="block font-semibold mb-2 text-gray-700 text-sm">Password</label>
                             <input
                                 type="password"
                                 value={config.password || ''}
                                 onChange={(e) => setConfig({...config, password: e.target.value})}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 placeholder="••••••••"
                             />
                         </div>
 
                         <div>
-                            <label className="block font-semibold mb-2 text-gray-700">Email From</label>
+                            <label className="block font-semibold mb-2 text-gray-700 text-sm">Email From</label>
                             <input
                                 type="email"
                                 value={config.email_from || ''}
                                 onChange={(e) => setConfig({...config, email_from: e.target.value})}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 placeholder="system@firma.pl"
                             />
                         </div>
@@ -1466,7 +1800,7 @@
                         <button
                             type="submit"
                             disabled={saving}
-                            className="w-full px-6 py-3 gradient-bg text-white rounded-xl font-semibold hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="w-full px-6 py-3 gradient-emerald text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/30 transition disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             {saving ? (
                                 <>
@@ -1505,10 +1839,11 @@
             if (loading) return <LoadingSpinner />;
 
             return (
-                <div className="p-8">
-                    <h2 className="text-3xl font-bold mb-8">Audit Log ({logs.length})</h2>
+                <div className="p-4 md:p-8 content-wrapper">
+                    <h2 className="text-3xl font-bold mb-6 text-gray-800">Audit Log <span className="text-gray-400">({logs.length})</span></h2>
 
-                    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    {/* Desktop Table */}
+                    <div className="hidden md:block glass rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                         <table className="w-full">
                             <thead className="bg-gray-50">
                                 <tr>
@@ -1526,7 +1861,7 @@
                                         </td>
                                         <td className="px-6 py-4 font-semibold">{log.user}</td>
                                         <td className="px-6 py-4">
-                                            <span className="px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
+                                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
                                                 {log.action}
                                             </span>
                                         </td>
@@ -1535,6 +1870,22 @@
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+
+                    {/* Mobile Cards */}
+                    <div className="md:hidden space-y-4">
+                        {logs.map(log => (
+                            <div key={log.id} className="glass rounded-2xl p-4 border border-gray-100 shadow-lg">
+                                <div className="flex justify-between items-start mb-2">
+                                    <p className="font-bold text-gray-800">{log.user}</p>
+                                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                                        {log.action}
+                                    </span>
+                                </div>
+                                <p className="text-sm text-gray-500 mb-2">{new Date(log.timestamp).toLocaleString('pl-PL')}</p>
+                                <p className="text-sm text-gray-700">{log.details || '-'}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
             );
@@ -1547,6 +1898,7 @@
             const [user, setUser] = useState(null);
             const [view, setView] = useState('dashboard');
             const [toast, setToast] = useState(null);
+            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
             useEffect(() => {
                 const token = localStorage.getItem('token');
@@ -1570,9 +1922,17 @@
                 setToast({ message, type });
             };
 
-            const handleLogout = () => {
-                setUser(null);
-                setView('dashboard');
+            const handleLogout = async () => {
+                try {
+                    await axios.post('/api/logout');
+                } catch (err) {
+                    console.error('Logout error:', err);
+                } finally {
+                    localStorage.removeItem('token');
+                    delete axios.defaults.headers.common['Authorization'];
+                    setUser(null);
+                    setView('dashboard');
+                }
             };
 
             if (!user) {
@@ -1581,10 +1941,22 @@
 
             return (
                 <div className="min-h-screen bg-gray-50">
-                    <Navbar user={user} onLogout={handleLogout} />
+                    <MobileHeader
+                        user={user}
+                        onMenuClick={() => setMobileMenuOpen(true)}
+                        onLogout={handleLogout}
+                    />
                     <div className="flex">
-                        <Sidebar activeView={view} setView={setView} role={user.role} />
-                        <div className="flex-1">
+                        <Sidebar
+                            activeView={view}
+                            setView={setView}
+                            role={user.role}
+                            user={user}
+                            onLogout={handleLogout}
+                            mobileOpen={mobileMenuOpen}
+                            setMobileOpen={setMobileMenuOpen}
+                        />
+                        <div className="flex-1 md:ml-0">
                             {view === 'dashboard' && <DashboardView user={user} />}
                             {view === 'new-request' && <NewRequestView user={user} showToast={showToast} setView={setView} />}
                             {view === 'my-requests' && <MyRequestsView user={user} showToast={showToast} />}
@@ -1594,6 +1966,18 @@
                             {view === 'audit' && <AuditLogView showToast={showToast} />}
                         </div>
                     </div>
+
+                    <MobileBottomNav activeView={view} setView={setView} role={user.role} />
+
+                    {/* Floating Action Button (Mobile only) */}
+                    {['pracownik', 'manager', 'admin'].includes(user.role) && (
+                        <button
+                            onClick={() => setView('new-request')}
+                            className="fab gradient-emerald text-white"
+                        >
+                            <Icons.Plus />
+                        </button>
+                    )}
 
                     {toast && (
                         <Toast
