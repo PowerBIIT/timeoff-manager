@@ -2,6 +2,8 @@
 
 System zarządzania wnioskami o wyjścia służbowe z pełnym systemem ról (Pracownik, Manager, Administrator).
 
+**🚀 LIVE:** https://timeoff-manager-20251004.azurewebsites.net
+
 > 📚 **Szukasz czegoś konkretnego?** → [INDEX.md](INDEX.md) - Pełna dokumentacja i nawigacja
 
 ## 🎯 Funkcje
@@ -16,10 +18,13 @@ System zarządzania wnioskami o wyjścia służbowe z pełnym systemem ról (Pra
 - ✅ Akceptacja/odrzucenie wniosków przez managera
 - ✅ Powiadomienia email (manager przy nowym wniosku, pracownik po decyzji)
 - ✅ Zarządzanie użytkownikami (admin)
+- ✅ Deaktywacja użytkowników (zamiast usuwania)
 - ✅ Konfiguracja SMTP (admin)
 - ✅ Audit log wszystkich akcji
 - ✅ Walidacja dat i godzin
-- ✅ Responsive design (desktop + mobile)
+- ✅ **Interaktywny dashboard z KPI**
+- ✅ **Premium duotone icons (2025 design)**
+- ✅ **Responsive design (desktop + mobile)** - mobile-first UI
 
 ## 🏗️ Tech Stack
 
@@ -32,7 +37,10 @@ System zarządzania wnioskami o wyjścia służbowe z pełnym systemem ról (Pra
 
 **Frontend:**
 - React 18 (via CDN + Babel)
-- Tailwind CSS
+- Tailwind CSS 3.4
+- Custom duotone SVG icons (2025 design trends)
+- Glassmorphism UI
+- Mobile-first responsive design
 - Axios
 
 **Deployment:**
@@ -84,41 +92,29 @@ Po inicjalizacji bazy danych dostępne są następujące konta:
 
 ⚠️ **WAŻNE:** Zmień hasła po pierwszym logowaniu!
 
-## 🚀 Deployment na Azure
+## 🚀 Production Deployment
 
-### ⚡ Quick Start (Development)
-```bash
-chmod +x azure-deploy.sh
-export DB_PASSWORD="YourStrongPassword123!"
-./azure-deploy.sh
-```
+**✅ APLIKACJA WDROŻONA:** https://timeoff-manager-20251004.azurewebsites.net
 
-### 🏭 Production Deployment
+### 📋 Po wdrożeniu (KRYTYCZNE):
+1. **Zmień hasła domyślnych kont** ⚠️
+   - admin@firma.pl → użyj silnego hasła
+   - manager@firma.pl → użyj silnego hasła
+   - jan@firma.pl → użyj silnego hasła
 
-**WAŻNE: Przed wdrożeniem produkcyjnym przeczytaj:**
-- 📘 [DEPLOYMENT.md](DEPLOYMENT.md) - Kompletny przewodnik wdrożenia
-- ✅ [PRODUCTION-CHECKLIST.md](PRODUCTION-CHECKLIST.md) - Checklist przed go-live
+2. **Skonfiguruj SMTP dla powiadomień email** ⚠️
+   - Gmail: smtp.gmail.com:587 (użyj App Password)
+   - Office365: smtp.office365.com:587
+   - SendGrid: smtp.sendgrid.net:587
 
-**Kroki:**
-1. Ustaw zmienne środowiskowe:
-```bash
-export DB_PASSWORD="VeryStrongProductionPassword123!@#"
-export RESOURCE_GROUP="timeoff-production"
-export APP_NAME="timeoff-manager-prod"
-```
+3. **Dodaj prawdziwych użytkowników**
+   - Usuń konta testowe (opcjonalnie)
+   - Przypisz managerów
 
-2. Uruchom deployment:
-```bash
-./azure-deploy.sh
-```
-
-3. **Po deploymencie:**
-   - Zmień hasła domyślnych kont
-   - Skonfiguruj SMTP
-   - Sprawdź monitoring i logi
-   - Wykonaj smoke tests
-
-Szczegóły w [DEPLOYMENT.md](DEPLOYMENT.md)
+### 📚 Szczegółowa dokumentacja:
+- 📘 [PRODUCTION-READY.md](PRODUCTION-READY.md) - Kompletny przewodnik produkcyjny
+- 📘 [DEPLOYMENT.md](DEPLOYMENT.md) - Instrukcje wdrożenia Azure
+- 📘 [USER-GUIDE.md](USER-GUIDE.md) - Instrukcja dla użytkowników
 
 ## 📡 API Endpoints
 
