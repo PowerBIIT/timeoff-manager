@@ -943,6 +943,21 @@
                 }
             };
 
+            const handleToggleActive = async (user) => {
+                const action = user.is_active ? 'deaktywować' : 'aktywować';
+                if (!confirm(`Czy na pewno ${action} użytkownika ${user.first_name} ${user.last_name}?`)) return;
+
+                try {
+                    await axios.put(`/api/users/${user.id}`, {
+                        is_active: !user.is_active
+                    });
+                    showToast(`Użytkownik ${user.is_active ? 'deaktywowany' : 'aktywowany'}`, 'success');
+                    loadUsers();
+                } catch (err) {
+                    showToast(err.response?.data?.error || 'Błąd zmiany statusu', 'error');
+                }
+            };
+
             if (loading) return <LoadingSpinner />;
 
             const roleLabels = {
@@ -971,6 +986,7 @@
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Email</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Rola</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Przełożony</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Akcje</th>
                                 </tr>
                             </thead>
@@ -988,6 +1004,11 @@
                                             {user.supervisor ? user.supervisor.name : '-'}
                                         </td>
                                         <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${user.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                                {user.is_active ? 'Aktywny' : 'Nieaktywny'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => setEditModal(user)}
@@ -996,8 +1017,15 @@
                                                     Edytuj
                                                 </button>
                                                 <button
+                                                    onClick={() => handleToggleActive(user)}
+                                                    className={`px-3 py-1 ${user.is_active ? 'bg-orange-500 hover:bg-orange-600' : 'bg-green-500 hover:bg-green-600'} text-white rounded-lg transition text-sm`}
+                                                >
+                                                    {user.is_active ? 'Deaktywuj' : 'Aktywuj'}
+                                                </button>
+                                                <button
                                                     onClick={() => handleDelete(user.id)}
                                                     className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm"
+                                                    title="Usuwa tylko użytkowników bez wniosków"
                                                 >
                                                     Usuń
                                                 </button>
