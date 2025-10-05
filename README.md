@@ -68,16 +68,24 @@ git push origin feature/xxx
 # 3. Test w DEV (Ctrl+F5 dla hard refresh)
 https://timeoff-manager-dev.azurewebsites.net
 
+# Sprawdź wersję wdrożenia:
+./check_deployment_version.sh dev
+
 # 4. Merge develop → master
 git checkout master && git merge develop
 git push origin master --tags
 
 # 5. Auto-deploy do PROD ✅ (~2-3 min)
 # PROD automatycznie wyłączy się po 30 min bezczynności
+
+# Sprawdź wersję wdrożenia PROD:
+./check_deployment_version.sh prod
 ```
 
 **WAŻNE:**
 - Po deployment frontend: **Ctrl+F5** (hard refresh) w przeglądarce
+- Sprawdź wersję: `./check_deployment_version.sh dev` lub `./check_deployment_version.sh prod`
+- Stopka na dole strony (desktop) pokazuje aktualny commit hash
 - PROD wyłącza się automatycznie po 30 min bez użycia (oszczędność ~$565/m)
 
 ## 🛠️ Tech Stack

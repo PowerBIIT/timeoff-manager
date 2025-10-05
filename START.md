@@ -111,6 +111,13 @@ https://timeoff-manager-dev.azurewebsites.net
 # Employee: jan@firma.pl / jan123
 
 # Po zmianach frontendowych: Ctrl+F5 (hard refresh) aby zobaczyć zmiany
+
+# ✅ WERYFIKACJA WDROŻENIA - sprawdź czy deployment ma najnowszy commit:
+./check_deployment_version.sh dev
+
+# Lub ręcznie sprawdź wersję:
+curl https://timeoff-manager-dev.azurewebsites.net/api/version
+# Porównaj commit hash z lokalnym: git rev-parse --short HEAD
 ```
 
 ### 3. Release do PROD
@@ -134,6 +141,16 @@ git push origin master --tags
 ```bash
 # Test (może wymagać hard refresh Ctrl+F5)
 https://timeoff-manager-20251004.azurewebsites.net
+
+# ✅ WERYFIKACJA WDROŻENIA - sprawdź czy deployment ma najnowszy commit:
+./check_deployment_version.sh prod
+
+# Lub ręcznie sprawdź wersję:
+curl https://timeoff-manager-20251004.azurewebsites.net/api/version
+# Porównaj commit hash z lokalnym: git rev-parse --short HEAD
+
+# Sprawdź wersję w przeglądarce - stopka na dole strony (desktop)
+# Powinna pokazywać: Build: [commit-hash] | [data] | master
 
 # PROD automatycznie wyłączy się po 30 min bezczynności (idle monitoring)
 # Oszczędność: ~$565/miesiąc
@@ -322,6 +339,26 @@ gh secret list
 # Powinno być:
 # AZURE_WEBAPP_PUBLISH_PROFILE (PROD)
 # AZURE_WEBAPP_PUBLISH_PROFILE_DEV (DEV)
+```
+
+### Problem: Wdrożenie pokazuje starą wersję
+```bash
+# 1. Sprawdź czy deployment się zakończył
+gh run list --limit 3
+
+# 2. Sprawdź wersję wdrożenia
+./check_deployment_version.sh dev  # lub prod
+
+# 3. Jeśli wersje się różnią:
+# - Poczekaj 2-3 minuty na zakończenie deployment
+# - Zrób hard refresh w przeglądarce (Ctrl+F5)
+# - Sprawdź stopkę na dole strony (desktop) - powinna pokazywać commit hash
+
+# 4. Sprawdź czy GitHub Actions zakończył się sukcesem
+gh run list --limit 1 --json status,conclusion,name
+
+# 5. Jeśli deployment success ale wersja nieaktualna - restart app
+az webapp restart -n timeoff-manager-dev -g timeoff-manager-rg-dev
 ```
 
 ### Problem: Za wysokie koszty
