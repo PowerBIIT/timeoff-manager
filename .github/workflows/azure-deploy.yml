@@ -36,7 +36,12 @@ jobs:
 
     - name: Generate version file
       run: |
-        python3 generate_version.py
+        echo "{" > version.json
+        echo "  \"commit\": \"$(git rev-parse --short HEAD)\"," >> version.json
+        echo "  \"date\": \"$(date +%Y-%m-%d)\"," >> version.json
+        echo "  \"branch\": \"${{ github.ref_name }}\"" >> version.json
+        echo "}" >> version.json
+        cat version.json
 
     - name: Run tests (if available)
       run: |
