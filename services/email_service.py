@@ -1,5 +1,6 @@
 """Email notification service"""
 import smtplib
+import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from models import SmtpConfig, db
@@ -82,6 +83,13 @@ def send_new_request_email(manager_email, employee_name, request_data):
     Returns:
         tuple: (success: bool, message: str)
     """
+    # Get app URL from environment
+    app_name = os.getenv('APP_NAME', 'timeoff-manager-20251004')
+    if os.getenv('FLASK_ENV') == 'production':
+        app_url = f"https://{app_name}.azurewebsites.net"
+    else:
+        app_url = "http://localhost:5000"
+
     subject = f"Nowy wniosek od {employee_name}"
 
     html = f"""
@@ -102,7 +110,7 @@ def send_new_request_email(manager_email, employee_name, request_data):
             </div>
 
             <p style="margin-top: 30px; text-align: center;">
-                <a href="http://localhost:5000"
+                <a href="{app_url}"
                    style="display: inline-block; padding: 12px 24px; background: linear-gradient(to right, #667eea, #764ba2); color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
                     Przejdź do aplikacji
                 </a>
