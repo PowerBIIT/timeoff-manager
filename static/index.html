@@ -140,8 +140,12 @@
             }
 
             .content-wrapper {
-                padding-bottom: 100px;
-                min-height: 100vh;
+                padding-bottom: 120px !important;
+                min-height: calc(100vh - 80px);
+            }
+
+            body {
+                padding-bottom: env(safe-area-inset-bottom);
             }
         }
 
@@ -964,6 +968,12 @@
                                                     <p className="text-xs text-gray-500 mb-1">Utworzono</p>
                                                     <p className="font-semibold text-sm">{new Date(req.created_at).toLocaleDateString('pl-PL')}</p>
                                                 </div>
+                                                {req.decision_date && (
+                                                    <div>
+                                                        <p className="text-xs text-gray-500 mb-1">Data decyzji</p>
+                                                        <p className="font-semibold text-sm">{new Date(req.decision_date).toLocaleDateString('pl-PL')}</p>
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="bg-gray-50 p-3 rounded-xl">
                                                 <p className="text-xs text-gray-500 mb-1">Powód</p>
@@ -1211,6 +1221,12 @@
                                                     <p className="text-xs text-gray-500 mb-1">Złożono</p>
                                                     <p className="font-semibold text-sm">{new Date(req.created_at).toLocaleDateString('pl-PL')}</p>
                                                 </div>
+                                                {req.decision_date && (
+                                                    <div>
+                                                        <p className="text-xs text-gray-500 mb-1">Data decyzji</p>
+                                                        <p className="font-semibold text-sm">{new Date(req.decision_date).toLocaleDateString('pl-PL')}</p>
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
                                                 <p className="text-xs text-amber-700 mb-1 font-semibold">Powód</p>
