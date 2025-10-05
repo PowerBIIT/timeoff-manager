@@ -39,3 +39,4 @@ Thumbs.db
 .env.local
 *.xml
 *.PublishSettings
+version.json
