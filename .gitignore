@@ -33,6 +33,8 @@ Thumbs.db
 
 # Logs
 *.log
+dev-logs/
+dev-logs.zip
 
 # Environment
 .env
@@ -40,3 +42,8 @@ Thumbs.db
 *.xml
 *.PublishSettings
 version.json
+
+# Testing & Screenshots
+.playwright-mcp/
+*.png
+screenshots/
