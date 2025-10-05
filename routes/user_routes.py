@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify, g
 from models import db, User, Request
 from auth import require_role, hash_password
 from services.audit_service import log_action
+from security import validate_email
 
 user_bp = Blueprint('users', __name__)
 
@@ -72,6 +73,10 @@ def create_user():
         for field in required_fields:
             if not data.get(field):
                 return jsonify({'error': f'Field {field} is required'}), 400
+
+        # Validate email format
+        if not validate_email(data['email']):
+            return jsonify({'error': 'Invalid email format'}), 400
 
         # Validate role
         if data['role'] not in ['pracownik', 'manager', 'admin']:

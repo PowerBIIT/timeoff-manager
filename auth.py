@@ -3,16 +3,19 @@ from functools import wraps
 from flask import request, jsonify, g
 import jwt
 import bcrypt
+from datetime import datetime, timedelta
 from config import Config
 from models import User
 
 
 def generate_token(user):
-    """Generate JWT token for user"""
+    """Generate JWT token for user with 8-hour expiration"""
     payload = {
         'user_id': user.id,
         'email': user.email,
-        'role': user.role
+        'role': user.role,
+        'exp': datetime.utcnow() + timedelta(hours=8),
+        'iat': datetime.utcnow()
     }
     token = jwt.encode(payload, Config.SECRET_KEY, algorithm='HS256')
     return token

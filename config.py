@@ -7,7 +7,9 @@ class Config:
     """Application configuration with environment variable validation"""
 
     # Flask
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    if not SECRET_KEY:
+        raise ValueError("SECRET_KEY environment variable must be set")
     FLASK_ENV = os.getenv('FLASK_ENV', 'development')
 
     # Database
@@ -29,7 +31,7 @@ class Config:
     @staticmethod
     def validate():
         """Validate required environment variables"""
-        required = ['DATABASE_URL', 'SECRET_KEY']
+        required = ['DATABASE_URL']
         missing = [var for var in required if not os.getenv(var)]
 
         if missing:

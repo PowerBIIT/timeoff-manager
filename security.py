@@ -2,6 +2,10 @@
 from functools import wraps
 from flask import request, jsonify
 import re
+from cryptography.fernet import Fernet
+import os
+import base64
+from hashlib import sha256
 
 
 def validate_email(email):
@@ -99,3 +103,60 @@ def validate_sql_injection(text):
             return False
 
     return True
+
+
+def get_encryption_key():
+    """
+    Get or derive encryption key from SECRET_KEY
+    Uses SHA256 to derive a valid Fernet key from SECRET_KEY
+    """
+    secret_key = os.getenv('SECRET_KEY')
+    if not secret_key:
+        raise ValueError("SECRET_KEY must be set for encryption")
+
+    # Derive a 32-byte key using SHA256
+    key_bytes = sha256(secret_key.encode()).digest()
+    # Fernet requires base64-encoded 32-byte key
+    return base64.urlsafe_b64encode(key_bytes)
+
+
+def encrypt_password(password):
+    """
+    Encrypt a password for secure storage
+
+    Args:
+        password: Plain text password to encrypt
+
+    Returns:
+        Encrypted password as string, or None if password is None/empty
+    """
+    if not password:
+        return None
+
+    key = get_encryption_key()
+    f = Fernet(key)
+    encrypted = f.encrypt(password.encode())
+    return encrypted.decode()
+
+
+def decrypt_password(encrypted_password):
+    """
+    Decrypt an encrypted password
+
+    Args:
+        encrypted_password: Encrypted password string
+
+    Returns:
+        Decrypted password as string, or None if input is None/empty
+    """
+    if not encrypted_password:
+        return None
+
+    try:
+        key = get_encryption_key()
+        f = Fernet(key)
+        decrypted = f.decrypt(encrypted_password.encode())
+        return decrypted.decode()
+    except Exception as e:
+        print(f"⚠️  Failed to decrypt password: {str(e)}")
+        return None

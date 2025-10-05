@@ -3,11 +3,13 @@ from flask import Blueprint, request, jsonify, g
 from models import db, User
 from auth import generate_token, verify_password, token_required
 from services.audit_service import log_action
+from security import rate_limit, validate_email
 
 auth_bp = Blueprint('auth', __name__)
 
 
 @auth_bp.route('/login', methods=['POST'])
+@rate_limit(max_requests=5, window_seconds=60)
 def login():
     """
     Login endpoint
@@ -23,6 +25,10 @@ def login():
 
         email = data.get('email')
         password = data.get('password')
+
+        # Validate email format
+        if not validate_email(email):
+            return jsonify({'error': 'Invalid email format'}), 400
 
         # Find user by email
         user = User.query.filter_by(email=email).first()
@@ -50,7 +56,10 @@ def login():
         }), 200
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        # Log error but don't expose details to client
+        import logging
+        logging.error(f"Login error: {str(e)}", exc_info=True)
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 @auth_bp.route('/logout', methods=['POST'])
@@ -69,7 +78,9 @@ def logout():
         return jsonify({'success': True}), 200
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        import logging
+        logging.error(f"Logout error: {str(e)}", exc_info=True)
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 @auth_bp.route('/me', methods=['GET'])
@@ -90,4 +101,6 @@ def get_current_user():
         return jsonify(user.to_dict()), 200
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        import logging
+        logging.error(f"Get current user error: {str(e)}", exc_info=True)
+        return jsonify({'error': 'Internal server error'}), 500

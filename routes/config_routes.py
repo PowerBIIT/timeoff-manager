@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify, g
 from models import db, SmtpConfig
 from auth import require_role
 from services.audit_service import log_action
+from security import encrypt_password
 
 config_bp = Blueprint('config', __name__)
 
@@ -78,8 +79,9 @@ def update_smtp_config():
             config.use_ssl = data['use_ssl']
         if 'login' in data:
             config.login = data['login']
-        if 'password' in data:
-            config.password = data['password']
+        if 'password' in data and data['password']:
+            # Encrypt password before storing
+            config.password = encrypt_password(data['password'])
         if 'email_from' in data:
             config.email_from = data['email_from']
 

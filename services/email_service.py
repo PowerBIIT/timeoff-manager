@@ -3,6 +3,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from models import SmtpConfig, db
+from security import decrypt_password
 
 
 def get_smtp_config():
@@ -50,7 +51,11 @@ def send_email(to_email, subject, html_body):
 
         # Login if credentials provided
         if smtp_config.login and smtp_config.password:
-            server.login(smtp_config.login, smtp_config.password)
+            # Decrypt password before using
+            decrypted_password = decrypt_password(smtp_config.password)
+            if not decrypted_password:
+                raise Exception("Failed to decrypt SMTP password")
+            server.login(smtp_config.login, decrypted_password)
 
         # Send email
         server.send_message(msg)

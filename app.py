@@ -34,11 +34,9 @@ def create_app():
     # Global error handler
     @app.errorhandler(Exception)
     def handle_error(e):
-        app.logger.error(f"Unhandled error: {str(e)}")
-        # W produkcji nie pokazuj szczegółów błędu
-        if os.getenv('FLASK_ENV') == 'production':
-            return {"error": "Internal server error"}, 500
-        return {"error": "Internal server error", "details": str(e)}, 500
+        app.logger.error(f"Unhandled error: {str(e)}", exc_info=True)
+        # Never expose error details to client in any environment
+        return {"error": "Internal server error"}, 500
 
     # Register blueprints
     from routes.auth_routes import auth_bp
@@ -60,6 +58,35 @@ def create_app():
     @app.route('/health')
     def health():
         return {"status": "healthy", "app": "TimeOff Manager"}, 200
+
+    # Security headers middleware
+    @app.after_request
+    def set_security_headers(response):
+        """Add security headers to all responses"""
+        # HTTPS enforcement in production
+        if os.getenv('FLASK_ENV') == 'production':
+            response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+
+        # Prevent clickjacking
+        response.headers['X-Frame-Options'] = 'DENY'
+
+        # Prevent MIME-type sniffing
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+
+        # XSS Protection (legacy browsers)
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+
+        # Content Security Policy
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self' 'unsafe-inline' 'unsafe-eval' "
+            "cdn.tailwindcss.com unpkg.com cdn.jsdelivr.net "
+            "fonts.googleapis.com fonts.gstatic.com"
+        )
+
+        # Referrer Policy
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+
+        return response
 
     return app
 
