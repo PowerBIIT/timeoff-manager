@@ -16,6 +16,7 @@ class User(db.Model):
     supervisor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
+    token_version = db.Column(db.Integer, default=0)  # For JWT invalidation on password change
 
     # Relationships
     supervisor = db.relationship('User', remote_side=[id], backref='subordinates')

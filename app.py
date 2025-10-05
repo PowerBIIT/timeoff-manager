@@ -1,6 +1,7 @@
 """Flask application entry point"""
 from flask import Flask, send_from_directory
 from flask_cors import CORS
+from flask_talisman import Talisman
 from config import Config
 from models import db
 import os
@@ -17,6 +18,24 @@ def create_app():
     except ValueError as e:
         print(f"⚠️  Configuration error: {e}")
         print("⚠️  Please set required environment variables in .env file")
+
+    # HTTPS enforcement with Talisman (production only)
+    if os.getenv('FLASK_ENV') == 'production':
+        csp = {
+            'default-src': "'self'",
+            'script-src': ["'self'", "'unsafe-inline'", "cdn.tailwindcss.com", "unpkg.com", "cdn.jsdelivr.net"],
+            'style-src': ["'self'", "'unsafe-inline'", "cdn.tailwindcss.com", "fonts.googleapis.com"],
+            'font-src': ["'self'", "fonts.gstatic.com"],
+            'img-src': ["'self'", "data:"],
+            'connect-src': ["'self'"]
+        }
+        Talisman(app,
+                 force_https=True,
+                 strict_transport_security=True,
+                 strict_transport_security_max_age=31536000,
+                 content_security_policy=csp,
+                 content_security_policy_nonce_in=['script-src'],
+                 feature_policy={'geolocation': "'none'", 'microphone': "'none'", 'camera': "'none'"})
 
     # CORS configuration - environment specific
     if os.getenv('FLASK_ENV') == 'production':
@@ -111,15 +130,21 @@ def create_app():
         # XSS Protection (legacy browsers)
         response.headers['X-XSS-Protection'] = '1; mode=block'
 
-        # Content Security Policy
+        # Content Security Policy (IMPROVED - removed unsafe-eval)
         response.headers['Content-Security-Policy'] = (
-            "default-src 'self' 'unsafe-inline' 'unsafe-eval' "
-            "cdn.tailwindcss.com unpkg.com cdn.jsdelivr.net "
-            "fonts.googleapis.com fonts.gstatic.com"
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' cdn.tailwindcss.com unpkg.com cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' cdn.tailwindcss.com fonts.googleapis.com; "
+            "font-src 'self' fonts.gstatic.com; "
+            "img-src 'self' data:; "
+            "connect-src 'self';"
         )
 
         # Referrer Policy
         response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+
+        # Permissions Policy (formerly Feature-Policy)
+        response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
 
         return response
 

@@ -5,12 +5,14 @@ Endpoint do czyszczenia bazy i utworzenia pierwszego admina
 from flask import Blueprint, request, jsonify
 from models import db, User, Request, SmtpConfig, AuditLog
 from auth import hash_password
+from security import rate_limit, validate_password_strength
 import os
 
 init_bp = Blueprint('init', __name__)
 
 
 @init_bp.route('/init-production', methods=['POST'])
+@rate_limit(max_requests=3, window_seconds=3600)  # Only 3 attempts per hour
 def init_production():
     """
     One-time production initialization endpoint
@@ -31,6 +33,15 @@ def init_production():
     SECURITY: Remove INIT_SECRET from Azure config after first use to disable this endpoint!
     """
     try:
+        # SECURITY: IP whitelist check (if configured)
+        allowed_ips = os.getenv('INIT_ALLOWED_IPS', '').split(',')
+        client_ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
+
+        if allowed_ips and allowed_ips[0]:  # If whitelist is configured
+            if client_ip not in allowed_ips:
+                print(f"⚠️ SECURITY: INIT endpoint blocked from IP {client_ip}")
+                return jsonify({'error': 'Access denied from this IP address'}), 403
+
         # SECURITY: Check if INIT_SECRET exists - if removed, endpoint is disabled
         init_secret = os.getenv('INIT_SECRET')
         if not init_secret:
@@ -47,8 +58,8 @@ def init_production():
             return jsonify({'error': 'No data provided'}), 400
 
         # Verify secret (must be set in environment)
-        init_secret = os.getenv('INIT_SECRET')
-        if not init_secret or init_secret != data.get('secret'):
+        if init_secret != data.get('secret'):
+            print(f"⚠️ SECURITY: Invalid INIT_SECRET from IP {client_ip}")
             return jsonify({'error': 'Invalid or missing INIT_SECRET'}), 403
 
         # Get admin credentials from request
@@ -64,9 +75,10 @@ def init_production():
         if '@' not in admin_email:
             return jsonify({'error': 'Invalid email address'}), 400
 
-        # Validate password strength
-        if len(admin_password) < 8:
-            return jsonify({'error': 'Password must be at least 8 characters'}), 400
+        # Validate password strength (use new stronger validation)
+        valid, message = validate_password_strength(admin_password)
+        if not valid:
+            return jsonify({'error': f'Password validation failed: {message}'}), 400
 
         # Clear all data
         deleted_requests = Request.query.delete()

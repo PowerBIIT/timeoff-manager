@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify, g
 from models import db, User, Request
 from auth import require_role, hash_password
 from services.audit_service import log_action
-from security import validate_email
+from security import validate_email, validate_password_strength, blacklist_token
 
 user_bp = Blueprint('users', __name__)
 
@@ -82,9 +82,10 @@ def create_user():
         if data['role'] not in ['pracownik', 'manager', 'admin']:
             return jsonify({'error': 'Invalid role'}), 400
 
-        # Validate password length
-        if len(data['password']) < 8:
-            return jsonify({'error': 'Password must be at least 8 characters long'}), 400
+        # Validate password strength (new stronger validation)
+        valid, message = validate_password_strength(data['password'])
+        if not valid:
+            return jsonify({'error': f'Password validation failed: {message}'}), 400
 
         # Check if email already exists
         existing_user = User.query.filter_by(email=data['email']).first()
@@ -171,18 +172,33 @@ def update_user(user_id):
             user.is_active = data['is_active']
 
         # Update password if provided
+        password_changed = False
         if 'password' in data and data['password']:
-            if len(data['password']) < 8:
-                return jsonify({'error': 'Password must be at least 8 characters long'}), 400
+            # Validate password strength
+            valid, message = validate_password_strength(data['password'])
+            if not valid:
+                return jsonify({'error': f'Password validation failed: {message}'}), 400
+
             user.password_hash = hash_password(data['password'])
+            password_changed = True
+
+            # Increment token_version to invalidate all existing tokens
+            if not hasattr(user, 'token_version'):
+                user.token_version = 0
+            user.token_version += 1
 
         db.session.commit()
+
+        # If admin changed their own password, blacklist current token
+        if password_changed and user.id == g.user_id:
+            if hasattr(g, 'token_jti') and g.token_jti:
+                blacklist_token(g.token_jti)
 
         # Log action
         log_action(
             g.user_id,
             'USER_UPDATED',
-            f'Updated user {user.email}'
+            f'Updated user {user.email}' + (' (password changed)' if password_changed else '')
         )
 
         return jsonify({'success': True}), 200
