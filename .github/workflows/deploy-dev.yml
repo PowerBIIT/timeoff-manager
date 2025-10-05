@@ -34,6 +34,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Generate version file
+      run: |
+        python3 generate_version.py
+
     - name: Run tests (if available)
       run: |
         echo "Running tests..."

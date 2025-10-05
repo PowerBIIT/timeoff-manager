@@ -61,6 +61,18 @@ def create_app():
     def health():
         return {"status": "healthy", "app": "TimeOff Manager"}, 200
 
+    # Version endpoint
+    @app.route('/api/version')
+    def version():
+        """Return git commit hash and deployment info"""
+        try:
+            import json
+            with open('version.json', 'r') as f:
+                version_info = json.load(f)
+            return version_info, 200
+        except FileNotFoundError:
+            return {"commit": "unknown", "date": "unknown", "branch": "unknown"}, 200
+
     # Security headers middleware
     @app.after_request
     def set_security_headers(response):

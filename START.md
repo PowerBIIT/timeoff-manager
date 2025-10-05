@@ -361,7 +361,31 @@ crontab -l | grep idle
    # → Auto-deploy TYLKO kodu (baza nietknięta)
    ```
 
-4. **Aktualizacja bazy danych (jeśli potrzeba):**
+4. **Czyszczenie bazy PROD (reset do fabrycznych):**
+   ```bash
+   # 1. Ustaw INIT_SECRET
+   INIT_SECRET="twój-secret-tutaj"
+   az webapp config appsettings set \
+     --name timeoff-manager-20251004 \
+     --resource-group timeoff-rg-prod \
+     --settings INIT_SECRET="$INIT_SECRET"
+
+   # 2. Restart PROD (wymagane!)
+   az webapp restart -n timeoff-manager-20251004 -g timeoff-rg-prod
+
+   # 3. Wyczyść bazę i utwórz admina
+   curl -X POST https://timeoff-manager-20251004.azurewebsites.net/api/init-production \
+     -H "Content-Type: application/json" \
+     -d '{"secret":"'$INIT_SECRET'","admin_email":"admin@firma.pl","admin_password":"SecurePass123!","admin_first_name":"Admin","admin_last_name":"System"}'
+
+   # 4. Wyłącz endpoint (bezpieczeństwo!)
+   az webapp config appsettings delete \
+     --name timeoff-manager-20251004 \
+     --resource-group timeoff-rg-prod \
+     --setting-names INIT_SECRET
+   ```
+
+5. **Aktualizacja bazy danych (migracje):**
    ```bash
    # Backup
    ./scripts/backup-prod-db.sh
@@ -373,7 +397,7 @@ crontab -l | grep idle
 
    📖 **Szczegóły:** [MIGRATIONS.md](MIGRATIONS.md)
 
-5. **Monitoruj koszty:**
+6. **Monitoruj koszty:**
    - Azure Portal → Cost Management → Cost Analysis
    - Filtruj po Resource Groups
 
