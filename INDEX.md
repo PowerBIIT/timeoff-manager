@@ -21,6 +21,7 @@ Zawiera:
 |------|------|----------|
 | [README.md](README.md) | Przegląd projektu, tech stack, API | Wszyscy |
 | [START.md](START.md) | **Kompletny przewodnik start-to-finish** | Wszyscy |
+| [MIGRATIONS.md](MIGRATIONS.md) | **Migracje bazy danych (PROD)** | DevOps, Developerzy |
 | [IDLE-MONITORING.md](IDLE-MONITORING.md) | Oszczędzanie kosztów, idle monitoring | DevOps, Admin |
 | [USER-GUIDE.md](USER-GUIDE.md) | Instrukcja dla użytkowników końcowych | End Users |
 | [TECHNICAL-DOCS.md](TECHNICAL-DOCS.md) | Architektura, API, modele danych | Developerzy |

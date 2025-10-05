@@ -25,12 +25,19 @@ def init_production():
     }
 
     ⚠️ This endpoint is only available when:
-    - Database has users (safety check)
+    - INIT_SECRET is set in environment
     - Correct INIT_SECRET is provided
 
-    After successful init, the endpoint returns 403 (to prevent reuse)
+    SECURITY: Remove INIT_SECRET from Azure config after first use to disable this endpoint!
     """
     try:
+        # SECURITY: Check if INIT_SECRET exists - if removed, endpoint is disabled
+        init_secret = os.getenv('INIT_SECRET')
+        if not init_secret:
+            return jsonify({
+                'error': 'Init endpoint is disabled. Remove INIT_SECRET from config to disable permanently.'
+            }), 403
+
         # Check if any users exist (safety check - only allow on empty DB)
         user_count = User.query.count()
 
