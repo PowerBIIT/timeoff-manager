@@ -99,7 +99,11 @@ def rate_limit(max_requests=5, window_seconds=60):
                     if current_time - req_time < window_seconds
                 ]
 
-                if len(_rate_limit_store[client_ip][f.__name__]) >= max_requests:
+                current_count = len(_rate_limit_store[client_ip][f.__name__])
+                print(f"📊 Rate limit check: {client_ip} on {f.__name__}: {current_count}/{max_requests} requests in {window_seconds}s window")
+
+                if current_count >= max_requests:
+                    print(f"🚫 RATE LIMIT TRIGGERED for {client_ip} on {f.__name__}: {len(_rate_limit_store[client_ip][f.__name__])} requests")
                     return jsonify({
                         'error': 'Too many requests. Please try again later.'
                     }), 429
