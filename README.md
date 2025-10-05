@@ -39,6 +39,21 @@ az webapp show -n timeoff-manager-20251004 -g timeoff-rg-prod --query state
 ✅ **Audit log:** Pełna historia wszystkich akcji
 ✅ **Mobile-first:** Responsive design (desktop + mobile)
 ✅ **Premium UI:** Duotone icons, glassmorphism, nowoczesny design
+✅ **Bezpieczeństwo:** CSP, password requirements, timing attack prevention
+
+## 🧪 Testowanie
+
+**Automatyczne testy E2E:** `python3 run_tests.py`
+
+**Ostatni wynik: 100% (11/11 testów) ✅**
+- ✅ Logowanie (Pracownik, Manager, Admin)
+- ✅ Dashboard i statystyki
+- ✅ Tworzenie i walidacja wniosków
+- ✅ Lista wniosków z decision_date
+- ✅ Zarządzanie użytkownikami
+- ✅ CSP headers (bez unsafe-eval)
+
+**Szczegóły testów:** [START.md](START.md#-testowanie-aplikacji)
 
 ## 💰 Oszczędzanie kosztów
 

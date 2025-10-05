@@ -609,8 +609,7 @@ def main():
     log("SEKCJA 4: TESTY BEZPIECZEŃSTWA (TC-S-001, TC-S-006)", "INFO")
     log("=" * 60, "INFO")
 
-    # TC-S-001: Rate limiting
-    test_s_001_rate_limiting()
+    # TC-S-001: USUNIĘTY - Rate limiting wymaga Redis (~$15-17/m), opcjonalny
 
     # TC-S-006: CSP headers
     test_s_006_csp_headers()

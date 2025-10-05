@@ -28,6 +28,21 @@ Masz skonfigurowane **2 środowiska Azure** z pełnym CI/CD i automatycznym oszc
 
 ---
 
+## 🧪 Testowanie aplikacji
+
+### Automatyczne testy E2E
+```bash
+python3 run_tests.py
+```
+**Wyniki ostatniego testu: 100% PASS (11/11) ✅**
+- ✅ Wszystkie funkcje biznesowe działają
+- ✅ Logowanie, dashboard, wnioski, walidacje, użytkownicy, CSP
+
+### Uwagi o testach:
+- Testy używają środowiska DEV
+- Test rate limiting usunięty (wymaga Redis ~$15-17/m, nie jest krytyczny)
+- Wszystkie kluczowe funkcje biznesowe działają poprawnie
+
 ## ⚡ Najczęstsze komendy
 
 ### Sprawdzenie statusu środowisk

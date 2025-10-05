@@ -47,3 +47,5 @@ version.json
 .playwright-mcp/
 *.png
 screenshots/
+test_results.json
+test_dev_app.py
