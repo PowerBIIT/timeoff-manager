@@ -101,8 +101,9 @@ git push origin master --tags
 
 | Dokument | Co znajdziesz |
 |----------|---------------|
-| **[START.md](START.md)** | **← GŁÓWNY PRZEWODNIK** - wszystko w jednym miejscu |
-| [IDLE-MONITORING.md](IDLE-MONITORING.md) | Auto-stop, oszczędzanie, konfiguracja |
+| **[START.md](START.md)** | **← GŁÓWNY PRZEWODNIK** - komendy, workflow, troubleshooting |
+| **[MIGRATIONS.md](MIGRATIONS.md)** | **Migracje bazy PROD** - jak bezpiecznie aktualizować DB |
+| [IDLE-MONITORING.md](IDLE-MONITORING.md) | Auto-stop, oszczędzanie kosztów |
 | [USER-GUIDE.md](USER-GUIDE.md) | Instrukcja dla użytkowników końcowych |
 | [TECHNICAL-DOCS.md](TECHNICAL-DOCS.md) | Architektura, API, modele danych |
 | [INDEX.md](INDEX.md) | Pełna nawigacja po dokumentacji |

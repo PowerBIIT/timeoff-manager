@@ -48,14 +48,18 @@ gunicorn app:app
 
 ### Database Operations
 ```bash
-# Inicjalizacja/reset bazy danych z seed data
+# Inicjalizacja/reset bazy danych z seed data (DEV only)
 python init_db.py
 
-# Migracja do nowego modelu z supervisor_id
-python migrate_to_supervisor.py
+# Migracje bazy danych (PROD) - Alembic
+alembic revision --autogenerate -m "opis zmiany"
+alembic upgrade head
+alembic downgrade -1
 
-# Ręczne uruchomienie migracji SQL
-python run_migration.py
+# Backup PROD przed migracją
+./scripts/backup-prod-db.sh
+
+# WAŻNE: Szczegóły w MIGRATIONS.md
 ```
 
 ### Azure Deployment
@@ -202,10 +206,15 @@ az postgres flexible-server stop --resource-group timeoff-rg-prod --name timeoff
 
 ## Documentation Files
 - `README.md` - główna dokumentacja z instrukcjami
+- `START.md` - kompletny przewodnik (komendy, workflow, troubleshooting)
+- `MIGRATIONS.md` - **migracje bazy PROD** (WAŻNE dla zmian w DB!)
+- `IDLE-MONITORING.md` - oszczędzanie kosztów Azure
 - `INDEX.md` - pełna nawigacja po dokumentacji
-- `PRODUCTION-READY.md` - przewodnik produkcyjny
-- `DEPLOYMENT.md` - instrukcje wdrożenia Azure
 - `USER-GUIDE.md` - instrukcja dla użytkowników końcowych
-- `TECHNICAL-DOCS.md` - szczegółowa dokumentacja techniczna
-- `TEST-PLAN-DETAILED.md` - szczegółowy plan testów
-- `TEST-EXECUTION-REPORT.md` - raport wykonania testów (100% PASS)
+- `TECHNICAL-DOCS.md` - architektura, API, modele danych
+
+## Important: Database Migrations
+- CI/CD **NIE** aktualizuje bazy automatycznie
+- Deployment (`git push`) aktualizuje tylko KOD
+- Migracje bazy: **RĘCZNIE** przez Alembic
+- Dokumentacja: `MIGRATIONS.md`

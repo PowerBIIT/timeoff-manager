@@ -183,11 +183,10 @@ az postgres flexible-server stop -n timeoff-db-20251004 -g timeoff-rg-prod
 
 | Plik | Co zawiera |
 |------|------------|
+| **`MIGRATIONS.md`** | **Migracje bazy PROD** - jak bezpiecznie aktualizować DB |
 | `IDLE-MONITORING.md` | Konfiguracja i troubleshooting idle monitoring |
 | `TECHNICAL-DOCS.md` | Architektura, API, modele danych |
 | `USER-GUIDE.md` | Instrukcja dla użytkowników końcowych |
-| `TEST-PLAN-DETAILED.md` | Plan testów |
-| `TEST-EXECUTION-REPORT.md` | Raport testów (100% PASS) |
 | `INDEX.md` | Pełna nawigacja po dokumentacji |
 
 ---
@@ -328,7 +327,7 @@ crontab -l | grep idle
 
 ## 🚀 Następne kroki
 
-### Teraz (development):
+### Development workflow:
 1. **Zatrzymaj PROD aby oszczędzić:**
    ```bash
    ./scripts/dev-only-mode.sh
@@ -339,32 +338,29 @@ crontab -l | grep idle
    - Push → Auto-deploy do DEV
    - Testuj w DEV
 
-3. **Monitoruj koszty:**
-   - Azure Portal → Cost Management → Cost Analysis
-   - Filtruj po Resource Groups
-
-### Przed wdrożeniem do klientów:
-1. **Wyczyść dane testowe z PROD:**
-   ```bash
-   python3 clear_prod_data.py
-   ```
-
-2. **Uruchom PROD:**
-   ```bash
-   ./scripts/production-mode.sh
-   ```
-
-3. **Skonfiguruj SMTP** (Settings w UI)
-
-4. **Utwórz pierwszego admina** produkcyjnego
-
-5. **Deploy przez GitHub Actions:**
+3. **Deployment do PROD:**
    ```bash
    git checkout master
    git merge develop
-   git tag v1.0.0
-   git push origin master --tags
+   git push origin master
+   # → Auto-deploy TYLKO kodu (baza nietknięta)
    ```
+
+4. **Aktualizacja bazy danych (jeśli potrzeba):**
+   ```bash
+   # Backup
+   ./scripts/backup-prod-db.sh
+
+   # Migracja
+   az webapp ssh -n timeoff-manager-20251004 -g timeoff-rg-prod
+   alembic upgrade head
+   ```
+
+   📖 **Szczegóły:** [MIGRATIONS.md](MIGRATIONS.md)
+
+5. **Monitoruj koszty:**
+   - Azure Portal → Cost Management → Cost Analysis
+   - Filtruj po Resource Groups
 
 ---
 
