@@ -47,8 +47,11 @@ def login():
         # Generate JWT token
         token = generate_token(user)
 
-        # Log action
-        log_action(user.id, 'USER_LOGIN', f'User {user.email} logged in')
+        # Log action (non-blocking)
+        try:
+            log_action(user.id, 'USER_LOGIN', f'User {user.email} logged in')
+        except:
+            pass  # Don't fail login if audit log fails
 
         return jsonify({
             'token': token,
