@@ -140,7 +140,8 @@
             }
 
             .content-wrapper {
-                padding-bottom: 80px;
+                padding-bottom: 100px;
+                min-height: 100vh;
             }
         }
 
@@ -675,24 +676,27 @@
         // ============================================
         const MobileBottomNav = ({ activeView, setView, role }) => {
             const navItems = [
-                { id: 'dashboard', label: 'Home', icon: '🏠', roles: ['pracownik', 'manager', 'admin'] },
-                { id: 'my-requests', label: 'Wnioski', icon: '📋', roles: ['pracownik', 'manager', 'admin'] },
-                { id: 'pending', label: 'Oczekujące', icon: '⏳', roles: ['manager', 'admin'] },
-                { id: 'users', label: 'Użytkownicy', icon: '👥', roles: ['admin'] },
+                { id: 'dashboard', label: 'Home', icon: Icons.Dashboard, roles: ['pracownik', 'manager', 'admin'] },
+                { id: 'my-requests', label: 'Wnioski', icon: Icons.Calendar, roles: ['pracownik', 'manager', 'admin'] },
+                { id: 'pending', label: 'Oczekujące', icon: Icons.Clock, roles: ['manager', 'admin'] },
+                { id: 'users', label: 'Użytkownicy', icon: Icons.Users, roles: ['admin'] },
             ].filter(item => item.roles.includes(role));
 
             return (
                 <div className="mobile-nav">
-                    {navItems.map(item => (
-                        <button
-                            key={item.id}
-                            onClick={() => setView(item.id)}
-                            className={`mobile-nav-item ${activeView === item.id ? 'active' : ''}`}
-                        >
-                            <span className="mobile-nav-icon">{item.icon}</span>
-                            <span className="font-medium">{item.label}</span>
-                        </button>
-                    ))}
+                    {navItems.map(item => {
+                        const IconComponent = item.icon;
+                        return (
+                            <button
+                                key={item.id}
+                                onClick={() => setView(item.id)}
+                                className={`mobile-nav-item ${activeView === item.id ? 'active' : ''}`}
+                            >
+                                <IconComponent className={`w-5 h-5 ${activeView === item.id ? 'text-emerald-500' : 'text-slate-400'}`} />
+                                <span className="font-medium text-[10px]">{item.label}</span>
+                            </button>
+                        );
+                    })}
                 </div>
             );
         };
