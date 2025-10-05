@@ -67,11 +67,32 @@ def create_app():
         """Return git commit hash and deployment info"""
         try:
             import json
-            with open('version.json', 'r') as f:
-                version_info = json.load(f)
-            return version_info, 200
-        except FileNotFoundError:
-            return {"commit": "unknown", "date": "unknown", "branch": "unknown"}, 200
+            import os
+
+            # Try multiple paths
+            paths = [
+                'version.json',
+                os.path.join(os.path.dirname(__file__), 'version.json'),
+                '/home/site/wwwroot/version.json'
+            ]
+
+            version_info = None
+            for path in paths:
+                try:
+                    with open(path, 'r') as f:
+                        version_info = json.load(f)
+                        break
+                except (FileNotFoundError, IOError):
+                    continue
+
+            if version_info:
+                return version_info, 200
+            else:
+                return {"commit": "unknown", "date": "unknown", "branch": "unknown", "error": "version.json not found"}, 200
+
+        except Exception as e:
+            app.logger.error(f"Version endpoint error: {str(e)}")
+            return {"commit": "unknown", "date": "unknown", "branch": "unknown", "error": str(e)}, 200
 
     # Security headers middleware
     @app.after_request
