@@ -57,7 +57,7 @@ Więcej: [IDLE-MONITORING.md](IDLE-MONITORING.md)
 ## 🔄 Workflow (develop → prod)
 
 ```bash
-# 1. Feature development
+# 1. Feature development (branch develop)
 git checkout -b feature/xxx
 # ... kod ...
 git push origin feature/xxx
@@ -65,16 +65,20 @@ git push origin feature/xxx
 # 2. PR → develop
 # → Auto-deploy do DEV ✅
 
-# 3. Test w DEV
-open https://timeoff-manager-dev.azurewebsites.net
+# 3. Test w DEV (Ctrl+F5 dla hard refresh)
+https://timeoff-manager-dev.azurewebsites.net
 
 # 4. Merge develop → master
 git checkout master && git merge develop
-git tag v1.0.0
 git push origin master --tags
 
-# 5. Auto-deploy do PROD ✅
+# 5. Auto-deploy do PROD ✅ (~2-3 min)
+# PROD automatycznie wyłączy się po 30 min bezczynności
 ```
+
+**WAŻNE:**
+- Po deployment frontend: **Ctrl+F5** (hard refresh) w przeglądarce
+- PROD wyłącza się automatycznie po 30 min bez użycia (oszczędność ~$565/m)
 
 ## 🛠️ Tech Stack
 

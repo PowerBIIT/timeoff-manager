@@ -109,6 +109,8 @@ https://timeoff-manager-dev.azurewebsites.net
 # Admin:    admin@firma.pl / admin123
 # Manager:  manager@firma.pl / manager123
 # Employee: jan@firma.pl / jan123
+
+# Po zmianach frontendowych: Ctrl+F5 (hard refresh) aby zobaczyć zmiany
 ```
 
 ### 3. Release do PROD
@@ -118,13 +120,26 @@ git checkout master
 git pull origin master
 git merge develop
 
-# Tag wersji
+# Tag wersji (opcjonalnie)
 git tag -a v1.1.0 -m "Release 1.1.0: Opis zmian"
 
 # Push
 git push origin master --tags
 
 # GitHub Actions → Auto-deploy do PROD ✅
+# Deployment zajmuje ~2-3 minuty
+```
+
+### 4. Po deployment PROD
+```bash
+# Test (może wymagać hard refresh Ctrl+F5)
+https://timeoff-manager-20251004.azurewebsites.net
+
+# PROD automatycznie wyłączy się po 30 min bezczynności (idle monitoring)
+# Oszczędność: ~$565/miesiąc
+
+# Lub ręcznie zatrzymaj PROD podczas developmentu:
+./scripts/dev-only-mode.sh
 ```
 
 ---
