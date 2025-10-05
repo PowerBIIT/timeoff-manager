@@ -1,231 +1,256 @@
 # TimeOff Manager
 
-System zarządzania wnioskami o wyjścia służbowe z pełnym systemem ról (Pracownik, Manager, Administrator).
+**System zarządzania wnioskami o wyjścia służbowe** z pełnym systemem ról, automatycznym workflow i powiadomieniami email.
 
-**🚀 PRODUCTION URL:** https://timeoff-manager-20251004.azurewebsites.net
+## 🌐 Środowiska
 
-⚠️ **UWAGA:** Serwisy Azure są ZATRZYMANE (aby nie generować kosztów na prywatnej subskrypcji).
+| Środowisko | URL | Przeznaczenie |
+|------------|-----|---------------|
+| **DEV** | https://timeoff-manager-dev.azurewebsites.net | Development i testy |
+| **PROD** | https://timeoff-manager-20251004.azurewebsites.net | Produkcja (klienci) |
 
-**Aby uruchomić aplikację:**
+## ⚡ Quick Start
+
+### Nowy użytkownik? Zacznij tutaj:
+
+**👉 [START.md](START.md) ← Wszystko czego potrzebujesz w jednym miejscu!**
+
+### Najczęstsze komendy
+
 ```bash
-# 1. Uruchom App Service
-az webapp start --resource-group timeoff-rg-prod --name timeoff-manager-20251004
+# Podczas developmentu (zatrzymaj PROD, oszczędź ~$565/m)
+./scripts/dev-only-mode.sh
 
-# 2. Uruchom PostgreSQL Database
-az postgres flexible-server start --resource-group timeoff-rg-prod --name timeoff-db-20251004
+# Przed wdrożeniem (uruchom PROD)
+./scripts/production-mode.sh
 
-# 3. Poczekaj ~2 minuty na pełne uruchomienie
-# 4. Aplikacja dostępna pod: https://timeoff-manager-20251004.azurewebsites.net
+# Sprawdź co działa
+az webapp show -n timeoff-manager-dev -g timeoff-manager-rg-dev --query state
+az webapp show -n timeoff-manager-20251004 -g timeoff-rg-prod --query state
 ```
 
-**Aby ZATRZYMAĆ serwisy (oszczędzanie kosztów):**
-```bash
-# 1. Zatrzymaj App Service
-az webapp stop --resource-group timeoff-rg-prod --name timeoff-manager-20251004
+## 🎯 Główne funkcje
 
-# 2. Zatrzymaj PostgreSQL Database
-az postgres flexible-server stop --resource-group timeoff-rg-prod --name timeoff-db-20251004
+✅ **System ról:** Pracownik, Manager, Administrator
+✅ **Wnioski:** Składanie, akceptacja, odrzucanie, anulowanie
+✅ **Powiadomienia:** Email do managera i pracownika
+✅ **Dashboard:** Interaktywne KPI z wykresami
+✅ **Hierarchia:** Supervisor-based (pracownik → manager → admin)
+✅ **Audit log:** Pełna historia wszystkich akcji
+✅ **Mobile-first:** Responsive design (desktop + mobile)
+✅ **Premium UI:** Duotone icons, glassmorphism, nowoczesny design
+
+## 💰 Oszczędzanie kosztów
+
+**Automatyczne oszczędzanie skonfigurowane!**
+
+✅ **Idle Monitoring** - zatrzymanie po 30 min bezczynności
+✅ **DEV-ONLY mode** - wyłącz PROD podczas developmentu
+
+**Potencjalne oszczędności:**
+- Bez auto-stop: **~$605/miesiąc**
+- Z idle monitoring: **~$50-200/m** (67-92% taniej!)
+- DEV-ONLY mode: **~$40/m** (93% taniej!)
+
+Więcej: [IDLE-MONITORING.md](IDLE-MONITORING.md)
+
+## 🔄 Workflow (develop → prod)
+
+```bash
+# 1. Feature development
+git checkout -b feature/xxx
+# ... kod ...
+git push origin feature/xxx
+
+# 2. PR → develop
+# → Auto-deploy do DEV ✅
+
+# 3. Test w DEV
+open https://timeoff-manager-dev.azurewebsites.net
+
+# 4. Merge develop → master
+git checkout master && git merge develop
+git tag v1.0.0
+git push origin master --tags
+
+# 5. Auto-deploy do PROD ✅
 ```
 
-> 📚 **Szukasz czegoś konkretnego?** → [INDEX.md](INDEX.md) - Pełna dokumentacja i nawigacja
-
-## 🎯 Funkcje
-
-### Role użytkowników
-- **Pracownik**: składa wnioski, widzi swoje wnioski, może anulować przed akceptacją
-- **Manager**: akceptuje/odrzuca wnioski swojego zespołu, widzi historię zespołu
-- **Administrator**: zarządza użytkownikami, konfiguruje system, widzi wszystko
-
-### Funkcjonalności
-- ✅ Składanie wniosków o wyjście (data, godziny, powód)
-- ✅ Akceptacja/odrzucenie wniosków przez managera
-- ✅ Powiadomienia email (manager przy nowym wniosku, pracownik po decyzji)
-- ✅ Zarządzanie użytkownikami (admin)
-- ✅ Deaktywacja użytkowników (zamiast usuwania)
-- ✅ Konfiguracja SMTP (admin)
-- ✅ Audit log wszystkich akcji
-- ✅ Walidacja dat i godzin
-- ✅ **Interaktywny dashboard z KPI**
-- ✅ **Premium duotone icons (2025 design)**
-- ✅ **Responsive design (desktop + mobile)** - mobile-first UI
-
-## 🏗️ Tech Stack
+## 🛠️ Tech Stack
 
 **Backend:**
-- Python 3.11
 - Flask 3.0.0
-- PostgreSQL (SQLAlchemy)
+- SQLAlchemy
+- PostgreSQL
 - JWT Authentication
-- bcrypt (haszowanie haseł)
+- bcrypt
 
 **Frontend:**
-- React 18 (via CDN + Babel)
-- Tailwind CSS 3.4
-- Custom duotone SVG icons (2025 design trends)
-- Glassmorphism UI
-- Mobile-first responsive design
+- React 18 (via CDN)
+- Tailwind CSS
 - Axios
+- Single-page application
 
-**Deployment:**
-- Azure App Service
+**Infrastructure:**
+- Azure App Service (Linux, Python 3.9)
 - Azure Database for PostgreSQL
+- GitHub Actions (CI/CD)
+- Azure CLI (management)
 
-## 📦 Instalacja
+## 📚 Dokumentacja
 
-### 1. Klonowanie repozytorium
+| Dokument | Co znajdziesz |
+|----------|---------------|
+| **[START.md](START.md)** | **← GŁÓWNY PRZEWODNIK** - wszystko w jednym miejscu |
+| [IDLE-MONITORING.md](IDLE-MONITORING.md) | Auto-stop, oszczędzanie, konfiguracja |
+| [USER-GUIDE.md](USER-GUIDE.md) | Instrukcja dla użytkowników końcowych |
+| [TECHNICAL-DOCS.md](TECHNICAL-DOCS.md) | Architektura, API, modele danych |
+| [INDEX.md](INDEX.md) | Pełna nawigacja po dokumentacji |
+
+## 🚀 Szybki setup (dla nowego developera)
+
 ```bash
-git clone <repository-url>
+# 1. Clone repo
+git clone https://github.com/PowerBIIT/timeoff-manager.git
 cd timeoff-manager
-```
 
-### 2. Instalacja zależności
-```bash
+# 2. Przeczytaj dokumentację
+cat START.md
+
+# 3. Local development
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate
 pip install -r requirements.txt
-```
-
-### 3. Konfiguracja
-```bash
 cp .env.example .env
-# Edytuj .env i ustaw DATABASE_URL oraz inne zmienne
-```
-
-### 4. Inicjalizacja bazy danych
-```bash
+# Edytuj .env
 python init_db.py
-```
-
-### 5. Uruchomienie aplikacji
-```bash
 python app.py
+
+# 4. Otwórz http://localhost:5000
+# Login: admin@firma.pl / admin123
 ```
 
-Aplikacja dostępna pod: http://localhost:5000
+## 📊 Struktura projektu
 
-## 👥 Domyślne konta testowe
+```
+timeoff-manager/
+├── app.py                  # Aplikacja Flask
+├── models.py               # Modele bazy danych
+├── auth.py                 # Autentykacja JWT
+├── routes/                 # API endpoints
+│   ├── auth_routes.py
+│   ├── request_routes.py
+│   ├── user_routes.py
+│   └── config_routes.py
+├── services/               # Logika biznesowa
+│   ├── email_service.py
+│   └── audit_service.py
+├── static/
+│   └── index.html          # Frontend (React SPA)
+├── scripts/                # Skrypty pomocnicze
+│   ├── dev-only-mode.sh    # Zatrzymaj PROD
+│   ├── production-mode.sh  # Uruchom PROD
+│   └── auto-stop-on-idle.sh # Idle monitoring
+└── docs/                   # Dokumentacja
+```
 
-Po inicjalizacji bazy danych dostępne są następujące konta:
+## 🔐 Domyślne konta (DEV)
 
-| Rola | Email | Hasło |
-|------|-------|-------|
-| Admin | admin@firma.pl | admin123 |
-| Manager | manager@firma.pl | manager123 |
-| Pracownik | jan@firma.pl | jan123 |
+Po `python init_db.py`:
 
-⚠️ **WAŻNE:** Zmień hasła po pierwszym logowaniu!
+| Email | Hasło | Rola | Supervisor |
+|-------|-------|------|------------|
+| admin@firma.pl | admin123 | Admin | - |
+| manager@firma.pl | manager123 | Manager | Admin |
+| jan@firma.pl | jan123 | Employee | Manager |
 
-## 🚀 Production Deployment
+⚠️ **PROD:** Usuń testowe dane przed wdrożeniem: `python3 clear_prod_data.py`
 
-**✅ APLIKACJA WDROŻONA:** https://timeoff-manager-20251004.azurewebsites.net
+## 🔧 Zmienne środowiskowe
 
-### 📋 Po wdrożeniu (KRYTYCZNE):
-1. **Zmień hasła domyślnych kont** ⚠️
-   - admin@firma.pl → użyj silnego hasła
-   - manager@firma.pl → użyj silnego hasła
-   - jan@firma.pl → użyj silnego hasła
+```bash
+# Wymagane
+DATABASE_URL=postgresql://user:pass@host:5432/db?sslmode=require
+SECRET_KEY=your-secret-key-here
 
-2. **Skonfiguruj SMTP dla powiadomień email** ⚠️
-   - Gmail: smtp.gmail.com:587 (użyj App Password)
-   - Office365: smtp.office365.com:587
-   - SendGrid: smtp.sendgrid.net:587
+# Opcjonalne (można skonfigurować przez UI)
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your-email@gmail.com
+SMTP_PASSWORD=your-app-password
+SMTP_FROM=your-email@gmail.com
+```
 
-3. **Dodaj prawdziwych użytkowników**
-   - Usuń konta testowe (opcjonalnie)
-   - Przypisz managerów
+## 🧪 Testowanie
 
-### 📚 Szczegółowa dokumentacja:
-- 📘 [PRODUCTION-READY.md](PRODUCTION-READY.md) - Kompletny przewodnik produkcyjny
-- 📘 [DEPLOYMENT.md](DEPLOYMENT.md) - Instrukcje wdrożenia Azure
-- 📘 [USER-GUIDE.md](USER-GUIDE.md) - Instrukcja dla użytkowników
+```bash
+# Local
+python app.py
+# Test: http://localhost:5000
 
-## 📡 API Endpoints
+# DEV
+curl https://timeoff-manager-dev.azurewebsites.net/health
 
-### Authentication
+# PROD
+curl https://timeoff-manager-20251004.azurewebsites.net/health
+
+# Oczekiwany wynik:
+# {"app":"TimeOff Manager","status":"healthy"}
+```
+
+## 📝 API Endpoints
+
+### Public
 - `POST /api/login` - Logowanie
 - `POST /api/logout` - Wylogowanie
-- `GET /api/me` - Informacje o zalogowanym użytkowniku
 
-### Requests (Wnioski)
+### Protected (wymaga JWT token)
+- `GET /api/me` - Dane zalogowanego użytkownika
 - `GET /api/requests` - Lista wniosków (filtrowana wg roli)
 - `POST /api/requests` - Nowy wniosek
 - `PUT /api/requests/:id/accept` - Akceptacja (manager/admin)
 - `PUT /api/requests/:id/reject` - Odrzucenie (manager/admin)
 - `DELETE /api/requests/:id` - Anulowanie (pracownik)
+- `GET /api/users` - Lista użytkowników (admin/manager)
+- `POST /api/users` - Nowy użytkownik (admin)
+- `PUT /api/users/:id` - Edycja użytkownika (admin)
+- `DELETE /api/users/:id` - Usunięcie użytkownika (admin)
+- `GET /api/smtp-config` - Konfiguracja SMTP (admin)
+- `POST /api/smtp-config` - Zapis SMTP (admin)
+- `GET /api/audit-logs` - Logi audytowe (admin)
 
-### Users (Admin only)
-- `GET /api/users` - Lista użytkowników
-- `POST /api/users` - Dodaj użytkownika
-- `PUT /api/users/:id` - Edytuj użytkownika
-- `DELETE /api/users/:id` - Usuń użytkownika
-- `GET /api/users/:id` - Szczegóły użytkownika
-
-### Configuration (Admin only)
-- `GET /api/smtp-config` - Pobierz konfigurację SMTP
-- `POST /api/smtp-config` - Zapisz konfigurację SMTP
-- `POST /api/smtp-config/test` - Test połączenia SMTP
-- `GET /api/audit-logs` - Logi audytowe
-
-## 🔐 Bezpieczeństwo
-
-- JWT token-based authentication
-- Hasła haszowane bcrypt
-- Role-based access control (middleware)
-- SQL injection protection (SQLAlchemy parametryzowane zapytania)
-- CORS skonfigurowany dla środowisk dev/prod
-
-## 📧 Konfiguracja Email
-
-Aby włączyć powiadomienia email:
-
-1. Zaloguj się jako **admin** (admin@firma.pl / admin123)
-2. Przejdź do **Ustawienia**
-3. Skonfiguruj SMTP:
-   - Server: smtp.gmail.com (dla Gmail)
-   - Port: 587
-   - Login: twój email
-   - Password: hasło aplikacji (nie hasło do konta!)
-   - Email From: adres nadawcy
-
-**Gmail:** Użyj [App Passwords](https://myaccount.google.com/apppasswords)
-
-## 🛠️ Development
-
-### Uruchomienie w trybie development
-```bash
-export FLASK_ENV=development
-python app.py
-```
-
-### Struktura projektu
-```
-timeoff-manager/
-├── app.py              # Flask entry point
-├── config.py           # Configuration
-├── models.py           # Database models
-├── auth.py             # Authentication
-├── init_db.py          # Database initialization
-├── routes/             # API routes
-│   ├── auth_routes.py
-│   ├── request_routes.py
-│   ├── user_routes.py
-│   └── config_routes.py
-├── services/           # Business logic
-│   ├── email_service.py
-│   └── audit_service.py
-└── static/
-    └── index.html      # Frontend React SPA
-```
-
-## 📝 License
-
-MIT
+Szczegóły: [TECHNICAL-DOCS.md](TECHNICAL-DOCS.md)
 
 ## 🤝 Contributing
 
-Pull requests are welcome!
+1. Fork repo
+2. Create feature branch: `git checkout -b feature/amazing-feature`
+3. Commit: `git commit -m 'feat: Add amazing feature'`
+4. Push: `git push origin feature/amazing-feature`
+5. Open Pull Request do `develop`
 
-## 📞 Support
+## 📄 License
 
-W razie problemów otwórz issue w repozytorium.
-# DEV Test - Sun Oct  5 11:59:38 CEST 2025
+Private project - PowerBIIT
+
+## 👥 Authors
+
+- **Radosław Broniszewski** - PowerBIIT
+- Built with **Claude Code** (claude.com/code)
+
+## 🆘 Pomoc
+
+**Pytania? Problemy?**
+1. Sprawdź [START.md](START.md)
+2. Zobacz [IDLE-MONITORING.md](IDLE-MONITORING.md) dla problemów z kosztami
+3. GitHub Issues: https://github.com/PowerBIIT/timeoff-manager/issues
+
+**Azure Portal:**
+- DEV: Resource Group `timeoff-manager-rg-dev`
+- PROD: Resource Group `timeoff-rg-prod`
+
+---
+
+**Wersja:** 1.0 Production Ready
+**Status:** ✅ Deployed z pełnym CI/CD i oszczędzaniem kosztów
+**Ostatnia aktualizacja:** 2025-10-05
