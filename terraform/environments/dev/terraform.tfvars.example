@@ -1,0 +1,11 @@
+# Development Environment Variables
+# Skopiuj do terraform.tfvars i uzupełnij wartości
+
+db_admin_username = "dbadmin"
+db_admin_password = "YourDevPassword123!"  # Change this!
+
+# Generate with: openssl rand -hex 32
+secret_key = "your-dev-secret-key-here"
+
+# Optional: Your public IP for database access
+# developer_ips = ["1.2.3.4"]
