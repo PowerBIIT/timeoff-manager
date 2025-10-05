@@ -1,6 +1,7 @@
 # TimeOff Manager - Infrastructure as Code (Terraform)
 
-Pełna infrastruktura Azure dla trzech środowisk: Development, Staging, Production.
+**2 środowiska:** Development + Production
+**Gotowe do wdrożenia na dowolną subskrypcję Azure**
 
 ---
 
@@ -12,67 +13,44 @@ terraform/
 ├── variables.tf                 # Zmienne globalne
 ├── modules/                     # Moduły reużywalne
 │   ├── app-service/            # Azure App Service + Plan
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   └── outputs.tf
 │   └── database/               # PostgreSQL Flexible Server
-│       ├── main.tf
-│       ├── variables.tf
-│       └── outputs.tf
 └── environments/               # Konfiguracje per środowisko
-    ├── dev/                   # Development
-    │   ├── main.tf
-    │   ├── variables.tf
-    │   ├── outputs.tf
-    │   └── terraform.tfvars.example
-    ├── staging/               # Staging/Pre-production
-    │   ├── main.tf
-    │   ├── variables.tf
-    │   ├── outputs.tf
-    │   └── terraform.tfvars.example
+    ├── dev/                   # Development/Testing
     └── prod/                  # Production
-        ├── main.tf
-        ├── variables.tf
-        ├── outputs.tf
-        └── terraform.tfvars.example
 ```
 
 ---
 
-## 🌍 Środowiska
+## 🌍 Architektura środowisk
 
-### Development
-- **App Service**: B1 (Basic tier)
-- **Database**: B_Standard_B1ms (Burstable, 1 vCore, 2GB RAM)
-- **Storage**: 32 GB
-- **Backup**: 7 dni, bez geo-redundancji
-- **HA**: Wyłączone
-- **Koszt**: ~$50-70/miesiąc
+### Development (DEV)
+**Cel:** Szybkie testowanie nowych funkcji przed produkcją
 
-### Staging
-- **App Service**: S1 (Standard tier)
-- **Database**: GP_Standard_D2s_v3 (2 vCores, 8GB RAM)
-- **Storage**: 64 GB
-- **Backup**: 14 dni, z geo-redundancją
-- **HA**: Wyłączone
-- **Koszt**: ~$200-250/miesiąc
+- **App Service:** B1 (Basic tier)
+- **Database:** B_Standard_B1ms (1 vCore, 2GB RAM)
+- **Storage:** 32 GB
+- **Backup:** 7 dni, bez geo-redundancji
+- **HA:** Wyłączone
+- **Koszt:** ~$40/miesiąc
+- **Optymalizacja:** Zatrzymuj po godzinach!
 
-### Production
-- **App Service**: P1v2 (Premium tier)
-- **Database**: GP_Standard_D4s_v3 (4 vCores, 16GB RAM)
-- **Storage**: 128 GB
-- **Backup**: 35 dni, z geo-redundancją
-- **HA**: Włączone (Zone-redundant)
-- **Monitoring**: Application Insights
-- **Security**: Azure Key Vault
-- **Deployment**: Blue-green (staging slot)
-- **Koszt**: ~$600-800/miesiąc
+### Production (PROD)
+**Cel:** Środowisko produkcyjne dla użytkowników końcowych
+
+- **App Service:** P1v2 (Premium tier) + staging slot
+- **Database:** GP_Standard_D4s_v3 (4 vCores, 16GB RAM)
+- **Storage:** 128 GB
+- **Backup:** 35 dni + geo-redundancja
+- **HA:** Zone-redundant
+- **Monitoring:** Application Insights
+- **Security:** Azure Key Vault
+- **Koszt:** ~$565/miesiąc
 
 ---
 
-## 🚀 Instalacja i użycie
+## 🚀 Wdrożenie na nową subskrypcję Azure
 
-### Wymagania
+### Krok 0: Wymagania
 
 ```bash
 # Terraform
@@ -81,141 +59,382 @@ terraform --version  # >= 1.0
 # Azure CLI
 az --version        # >= 2.0
 az login
+az account list --output table
+az account set --subscription "Nazwa-lub-ID-subskrypcji"
 ```
 
-### Krok 1: Przygotowanie zmiennych
+### Krok 1: Przygotowanie zmiennych środowiska
 
+#### Development
 ```bash
-# Wybierz środowisko (dev/staging/prod)
 cd terraform/environments/dev
 
-# Skopiuj przykładowy plik
+# Skopiuj template
 cp terraform.tfvars.example terraform.tfvars
 
 # Edytuj wartości
 nano terraform.tfvars
 ```
 
-**Ważne zmienne:**
+**`terraform.tfvars` (DEV):**
 ```hcl
-db_admin_password = "SilneHaslo123!"        # Min 16 znaków dla prod
-secret_key        = "generuj-openssl-rand"   # Min 32 znaki dla prod
+db_admin_username = "dbadmin"
+db_admin_password = "DevPassword123!"  # Min 8 znaków
+
+# Generuj: openssl rand -hex 32
+secret_key = "dev-secret-key-change-this-32-chars-minimum"
+
+# Opcjonalnie: IP do dostępu do bazy
+developer_ips = ["1.2.3.4"]  # Twoje IP
+```
+
+#### Production
+```bash
+cd terraform/environments/prod
+
+cp terraform.tfvars.example terraform.tfvars
+nano terraform.tfvars
+```
+
+**`terraform.tfvars` (PROD):**
+```hcl
+db_admin_username = "dbadmin"
+db_admin_password = "SILNE-HASLO-MIN-16-CHARS!"  # Min 16 znaków!
+
+# Generuj: openssl rand -hex 32
+secret_key = "prod-unique-secret-key-64-chars-recommended"
 ```
 
 **Generowanie bezpiecznych wartości:**
 ```bash
-# SECRET_KEY (hex, 32 znaki)
+# SECRET_KEY (hex, 64 znaki dla prod)
 openssl rand -hex 32
 
 # DB Password (base64, ~24 znaki)
 openssl rand -base64 24
 ```
 
-### Krok 2: Inicjalizacja Terraform
+---
+
+### Krok 2: Wdrożenie Development
 
 ```bash
-# Wewnątrz environments/dev (lub staging/prod)
+cd terraform/environments/dev
+
+# Inicjalizacja
 terraform init
-```
 
-### Krok 3: Plan zmian
-
-```bash
+# Sprawdź co zostanie utworzone
 terraform plan
-```
 
-Sprawdź co zostanie utworzone:
-- Resource Group
-- PostgreSQL Flexible Server
-- PostgreSQL Database
-- App Service Plan
-- App Service (Web App)
-- Firewall rules
-- (prod) Application Insights
-- (prod) Key Vault
-
-### Krok 4: Wdrożenie
-
-```bash
+# Wdróż (potwierdź: yes)
 terraform apply
 
-# Potwierdź: yes
+# Zapisz outputs
+terraform output > dev-outputs.txt
+terraform output -raw connection_string > dev-db-connection.txt
 ```
 
-### Krok 5: Pobierz dane wyjściowe
+**Co zostanie utworzone:**
+- Resource Group: `timeoff-manager-rg-dev`
+- App Service Plan: `timeoff-manager-plan-dev`
+- App Service: `timeoff-manager-dev`
+- PostgreSQL Server: `timeoff-manager-db-dev`
+- PostgreSQL Database: `timeoffdb`
+- Firewall rules
+
+**Czas:** ~10-15 minut
+
+---
+
+### Krok 3: Konfiguracja Development
 
 ```bash
-# URL aplikacji
-terraform output app_service_url
+# Pobierz URL aplikacji
+DEV_URL=$(terraform output -raw app_service_url)
+echo "DEV URL: $DEV_URL"
 
-# Connection string (sensitive)
-terraform output -raw connection_string
+# Start Azure services (jeśli zatrzymane)
+az webapp start -n timeoff-manager-dev -g timeoff-manager-rg-dev
+az postgres flexible-server start -n timeoff-manager-db-dev -g timeoff-manager-rg-dev
 
-# Wszystkie outputy
-terraform output
+# Test health check
+curl $DEV_URL/health
 ```
 
 ---
 
-## 📊 Zarządzanie wieloma środowiskami
+### Krok 4: Wdrożenie Production
 
-### Wdrożenie wszystkich środowisk
+```bash
+cd terraform/environments/prod
+
+# Inicjalizacja
+terraform init
+
+# Plan - SPRAWDŹ DOKŁADNIE!
+terraform plan
+
+# Wdróż (OSTROŻNIE!)
+terraform apply
+
+# Zapisz outputs
+terraform output > prod-outputs.txt
+terraform output -raw connection_string > prod-db-connection.txt
+terraform output -raw application_insights_key > prod-insights-key.txt
+```
+
+**Co zostanie utworzone:**
+- Resource Group: `timeoff-manager-rg-prod`
+- App Service Plan: `timeoff-manager-plan-prod`
+- App Service: `timeoff-manager-prod` + staging slot
+- PostgreSQL Server: `timeoff-manager-db-prod` (HA)
+- PostgreSQL Database: `timeoffdb`
+- Application Insights
+- Azure Key Vault
+- Firewall rules
+
+**Czas:** ~20-30 minut (HA database trwa dłużej)
+
+---
+
+### Krok 5: Inicjalizacja bazy danych
 
 ```bash
 # Development
-cd terraform/environments/dev
-terraform init
-terraform apply
-
-# Staging
-cd ../staging
-terraform init
-terraform apply
+cd /home/radek/timeoff-manager
+export DATABASE_URL="postgresql://dbadmin:password@timeoff-manager-db-dev.postgres.database.azure.com:5432/timeoffdb?sslmode=require"
+export SECRET_KEY="dev-secret-key"
+python3 init_db.py
 
 # Production
-cd ../prod
-terraform init
-terraform apply
-```
-
-### Praca z konkretnym środowiskiem
-
-```bash
-# Zawsze pracuj z katalogu środowiska
-cd terraform/environments/prod
-
-# Zobacz stan
-terraform state list
-
-# Zaktualizuj infrastrukturę
-terraform apply
-
-# Usuń środowisko (OSTROŻNIE!)
-terraform destroy
+export DATABASE_URL="postgresql://dbadmin:password@timeoff-manager-db-prod.postgres.database.azure.com:5432/timeoffdb?sslmode=require"
+export SECRET_KEY="prod-secret-key"
+python3 clear_prod_data.py  # Czyści testowe dane
+# Następnie utwórz admina produkcyjnego
 ```
 
 ---
 
-## 🔐 Bezpieczeństwo
+### Krok 6: Deployment aplikacji
 
-### Wrażliwe pliki (dodane do .gitignore)
-
-```
-terraform.tfvars         # Sekrety per środowisko
-*.tfstate               # Stan Terraform
-*.tfstate.backup
-.terraform/             # Provider plugins
-```
-
-### Remote State (zalecane dla produkcji)
+#### Opcja A: GitHub Actions (zalecane)
 
 ```bash
-# 1. Utwórz Storage Account dla state
-az group create -n terraform-state-rg -l westeurope
-az storage account create -n tfstate$RANDOM -g terraform-state-rg -l westeurope --sku Standard_LRS
-az storage container create -n tfstate --account-name <nazwa>
+# 1. Pobierz publish profiles z Azure
+az webapp deployment list-publishing-profiles \
+  -n timeoff-manager-dev \
+  -g timeoff-manager-rg-dev \
+  --xml > dev-publish-profile.xml
 
-# 2. Odkomentuj backend w prod/main.tf
+az webapp deployment list-publishing-profiles \
+  -n timeoff-manager-prod \
+  -g timeoff-manager-rg-prod \
+  --xml > prod-publish-profile.xml
+
+# 2. Dodaj jako GitHub Secrets
+# Settings → Secrets → Actions → New repository secret
+# AZURE_WEBAPP_PUBLISH_PROFILE_DEV = <zawartość dev-publish-profile.xml>
+# AZURE_WEBAPP_PUBLISH_PROFILE_PROD = <zawartość prod-publish-profile.xml>
+
+# 3. Push do GitHub → automatyczny deployment!
+```
+
+#### Opcja B: Manualne wdrożenie
+
+```bash
+# Development
+cd /home/radek/timeoff-manager
+zip -r deploy.zip . -x "*.git*" -x "*__pycache__*" -x "venv/*" -x ".env"
+
+az webapp deployment source config-zip \
+  -g timeoff-manager-rg-dev \
+  -n timeoff-manager-dev \
+  --src deploy.zip
+
+# Production
+az webapp deployment source config-zip \
+  -g timeoff-manager-rg-prod \
+  -n timeoff-manager-prod \
+  --src deploy.zip
+```
+
+---
+
+## 🔄 Proces DEV → PROD
+
+### 1. Development & Testing
+
+```bash
+# Developer lokalnie
+git checkout -b feature/nowa-funkcja
+# ... kodowanie ...
+git commit -m "feat: nowa funkcja"
+git push origin feature/nowa-funkcja
+
+# Create Pull Request → develop branch
+# Merge → automatyczny deploy do DEV
+```
+
+### 2. Testowanie w DEV
+
+```bash
+# DEV URL
+https://timeoff-manager-dev.azurewebsites.net
+
+# Testy:
+# - Funkcjonalne
+# - Regresyjne
+# - Integracyjne
+
+# Jeśli OK → Merge do master
+```
+
+### 3. Release do PRODUCTION
+
+```bash
+# Merge develop → master
+git checkout master
+git merge develop
+git tag -a v1.2.0 -m "Release 1.2.0"
+git push origin master --tags
+
+# GitHub Actions → automatyczny deploy do PROD
+```
+
+---
+
+## 💰 Zarządzanie kosztami
+
+### Zatrzymywanie DEV po godzinach
+
+```bash
+# Stop DEV (wieczorem)
+az webapp stop -n timeoff-manager-dev -g timeoff-manager-rg-dev
+az postgres flexible-server stop -n timeoff-manager-db-dev -g timeoff-manager-rg-dev
+
+# Start DEV (rano)
+az webapp start -n timeoff-manager-dev -g timeoff-manager-rg-dev
+az postgres flexible-server start -n timeoff-manager-db-dev -g timeoff-manager-rg-dev
+```
+
+**Skrypt automatyczny** (`scripts/dev-schedule.sh`):
+```bash
+#!/bin/bash
+# Zatrzymaj DEV o 18:00, uruchom o 8:00
+
+HOUR=$(date +%H)
+
+if [ $HOUR -ge 18 ] || [ $HOUR -lt 8 ]; then
+    echo "Stopping DEV..."
+    az webapp stop -n timeoff-manager-dev -g timeoff-manager-rg-dev
+    az postgres flexible-server stop -n timeoff-manager-db-dev -g timeoff-manager-rg-dev
+else
+    echo "Starting DEV..."
+    az webapp start -n timeoff-manager-dev -g timeoff-manager-rg-dev
+    az postgres flexible-server start -n timeoff-manager-db-dev -g timeoff-manager-rg-dev
+fi
+```
+
+**Oszczędność:** ~50% kosztów DEV (~$20/m zamiast $40/m)
+
+---
+
+## 🔧 Aktualizacja infrastruktury
+
+### Skalowanie App Service
+
+```hcl
+# environments/prod/main.tf
+module "app_service" {
+  sku_name = "P2v2"  # Zmień z P1v2 na P2v2
+}
+```
+
+```bash
+terraform plan
+terraform apply
+```
+
+### Zwiększenie storage bazy
+
+```hcl
+module "database" {
+  storage_mb = 262144  # 256 GB (było 128 GB)
+}
+```
+
+---
+
+## 🗑️ Usuwanie środowisk
+
+### Usuń Development
+
+```bash
+cd terraform/environments/dev
+terraform destroy
+# Potwierdź: yes
+```
+
+### Usuń Production (OSTROŻNIE!)
+
+```bash
+cd terraform/environments/prod
+terraform destroy
+# Potwierdź: yes
+```
+
+**UWAGA:** To usunie WSZYSTKIE zasoby i DANE!
+
+---
+
+## 📊 Monitorowanie
+
+### Application Insights (PROD)
+
+```bash
+# Pobierz Instrumentation Key
+cd terraform/environments/prod
+terraform output -raw application_insights_key
+
+# Dodaj do App Service
+az webapp config appsettings set \
+  -g timeoff-manager-rg-prod \
+  -n timeoff-manager-prod \
+  --settings APPINSIGHTS_INSTRUMENTATIONKEY="<key>"
+```
+
+### Logi aplikacji
+
+```bash
+# DEV
+az webapp log tail -n timeoff-manager-dev -g timeoff-manager-rg-dev
+
+# PROD
+az webapp log tail -n timeoff-manager-prod -g timeoff-manager-rg-prod
+```
+
+---
+
+## 🔐 Remote State (zalecane dla zespołów)
+
+### Konfiguracja
+
+```bash
+# 1. Utwórz Storage Account dla Terraform state
+az group create -n terraform-state-rg -l westeurope
+
+az storage account create \
+  -n tfstate$RANDOM \
+  -g terraform-state-rg \
+  -l westeurope \
+  --sku Standard_LRS
+
+az storage container create \
+  -n tfstate \
+  --account-name <nazwa-z-poprzedniego-kroku>
+
+# 2. Odkomentuj backend w main.tf
 terraform {
   backend "azurerm" {
     resource_group_name  = "terraform-state-rg"
@@ -231,78 +450,7 @@ terraform init -migrate-state
 
 ---
 
-## 📝 Typowe operacje
-
-### Skalowanie App Service
-
-```hcl
-# W environments/prod/main.tf
-module "app_service" {
-  sku_name = "P2v2"  # Zmień z P1v2 na P2v2
-}
-```
-
-```bash
-terraform apply
-```
-
-### Zwiększenie storage bazy danych
-
-```hcl
-# W environments/prod/main.tf
-module "database" {
-  storage_mb = 262144  # 256 GB (było 128 GB)
-}
-```
-
-### Dodanie IP do firewall
-
-```hcl
-# W environments/dev/main.tf
-module "database" {
-  allowed_ip_addresses = ["1.2.3.4", "5.6.7.8"]
-}
-```
-
----
-
-## 🔄 CI/CD Integration
-
-### GitHub Actions z Terraform
-
-```yaml
-# .github/workflows/terraform.yml
-name: Terraform Production Deploy
-
-on:
-  push:
-    branches: [main]
-    paths: ['terraform/**']
-
-jobs:
-  terraform:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: hashicorp/setup-terraform@v2
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: terraform/environments/prod
-
-      - name: Terraform Plan
-        run: terraform plan
-        env:
-          TF_VAR_db_admin_password: ${{ secrets.DB_PASSWORD }}
-          TF_VAR_secret_key: ${{ secrets.SECRET_KEY }}
-
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve
-```
-
----
-
-## 🛠️ Troubleshooting
+## 🆘 Troubleshooting
 
 ### Problem: "Resource already exists"
 
@@ -311,59 +459,57 @@ jobs:
 terraform import azurerm_resource_group.main /subscriptions/.../resourceGroups/nazwa
 ```
 
-### Problem: "Backend initialization failed"
+### Problem: Błąd połączenia z bazą
 
 ```bash
-# Usuń lokalny state i ponów init
-rm -rf .terraform
-terraform init
+# Sprawdź firewall rules
+az postgres flexible-server firewall-rule list \
+  -g timeoff-manager-rg-dev \
+  -n timeoff-manager-db-dev
+
+# Dodaj swoje IP
+az postgres flexible-server firewall-rule create \
+  -g timeoff-manager-rg-dev \
+  -n timeoff-manager-db-dev \
+  -r AllowMyIP \
+  --start-ip-address <twoje-ip> \
+  --end-ip-address <twoje-ip>
 ```
 
-### Problem: "Invalid credentials"
+### Problem: App Service nie działa
 
 ```bash
-# Zaloguj ponownie do Azure
-az login
-az account set --subscription "nazwa-subskrypcji"
+# Sprawdź logi
+az webapp log tail -n <app-name> -g <rg-name>
+
+# Restart
+az webapp restart -n <app-name> -g <rg-name>
+
+# Sprawdź zmienne środowiskowe
+az webapp config appsettings list -n <app-name> -g <rg-name>
 ```
 
 ---
 
-## 💰 Szacunkowe koszty (miesięcznie)
+## 📚 Dodatkowa dokumentacja
 
-| Środowisko | App Service | Database | Storage | Backup | **Total** |
-|-----------|------------|----------|---------|--------|-----------|
-| Dev       | $13        | $25      | $2      | -      | **~$40**  |
-| Staging   | $73        | $140     | $5      | $10    | **~$230** |
-| Production| $170       | $360     | $10     | $25    | **~$565** |
-
-*Ceny orientacyjne (West Europe, 2025)*
-
-### Optymalizacja kosztów
-
-1. **Dev**: Zatrzymuj po godzinach
-```bash
-az webapp stop -n timeoff-manager-dev -g timeoff-manager-rg-dev
-az postgres flexible-server stop -n timeoff-manager-db-dev -g timeoff-manager-rg-dev
-```
-
-2. **Staging**: Używaj tylko przed release
-3. **Production**: Reserved instances (-30%)
+- [DEPLOYMENT-GUIDE.md](../DEPLOYMENT-GUIDE.md) - Przewodnik wdrożenia aplikacji
+- [PRODUCTION-DEPLOYMENT-GUIDE.md](../PRODUCTION-DEPLOYMENT-GUIDE.md) - Przygotowanie do produkcji
+- [TECHNICAL-DOCS.md](../TECHNICAL-DOCS.md) - Dokumentacja techniczna
 
 ---
 
-## 📚 Dokumentacja
+## 💡 Tips & Best Practices
 
-- [Terraform Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
-- [Azure App Service Pricing](https://azure.microsoft.com/pricing/details/app-service/)
-- [Azure PostgreSQL Pricing](https://azure.microsoft.com/pricing/details/postgresql/)
-- [Best Practices](https://learn.microsoft.com/azure/well-architected/)
+1. **Zawsze testuj w DEV przed PROD**
+2. **Używaj tagów Git dla release** (v1.0.0, v1.1.0)
+3. **Backup produkcyjnej bazy przed update**
+4. **Monitoruj koszty** (Azure Cost Management)
+5. **Zatrzymuj DEV po godzinach**
+6. **Używaj Remote State dla zespołów**
+7. **Dokumentuj każdą zmianę infrastruktury**
 
 ---
-
-## 🆘 Wsparcie
-
-Issues: https://github.com/PowerBIIT/timeoff-manager/issues
-Docs: ../TECHNICAL-DOCS.md
 
 **Ostatnia aktualizacja:** 2025-10-05
+**Wersja:** 2.0 (2 środowiska)

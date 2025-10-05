@@ -1,19 +1,19 @@
-name: Deploy to PRODUCTION
+name: Deploy to DEV
 
 on:
   push:
     branches:
-      - master
+      - develop
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: timeoff-manager-20251004
+  AZURE_WEBAPP_NAME: timeoff-manager-dev
   PYTHON_VERSION: '3.9'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: production  # Wymaga manual approval w GitHub
+    environment: development
 
     steps:
     - name: Checkout code
@@ -44,21 +44,20 @@ jobs:
         rm -rf venv
         zip -r deploy.zip . -x "*.git*" -x "*__pycache__*" -x "*.pyc" -x "venv/*" -x ".env" -x "terraform/*"
 
-    - name: Deploy to Azure Web App
+    - name: Deploy to Azure Web App (DEV)
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV }}
         package: deploy.zip
 
     - name: Deployment notification
       if: success()
       run: |
-        echo "✅ PRODUCTION Deployment successful!"
+        echo "✅ DEV Deployment successful!"
         echo "🔗 URL: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
-        echo "🏷️  Tag: ${{ github.ref_name }}"
 
     - name: Deployment failed notification
       if: failure()
       run: |
-        echo "❌ PRODUCTION Deployment failed - check logs above"
+        echo "❌ DEV Deployment failed - check logs above"

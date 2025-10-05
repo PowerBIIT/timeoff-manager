@@ -1,8 +1,0 @@
-# Staging Environment Variables
-# Skopiuj do terraform.tfvars i uzupełnij wartości
-
-db_admin_username = "dbadmin"
-db_admin_password = "YourStagingPassword123!"  # Change this! Use strong password
-
-# Generate with: openssl rand -hex 32
-secret_key = "your-staging-secret-key-different-from-prod"
