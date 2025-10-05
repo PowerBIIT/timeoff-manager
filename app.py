@@ -43,11 +43,13 @@ def create_app():
     from routes.request_routes import request_bp
     from routes.user_routes import user_bp
     from routes.config_routes import config_bp
+    from routes.init_routes import init_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(request_bp, url_prefix='/api')
     app.register_blueprint(user_bp, url_prefix='/api')
     app.register_blueprint(config_bp, url_prefix='/api')
+    app.register_blueprint(init_bp, url_prefix='/api')
 
     # Serve frontend
     @app.route('/')
